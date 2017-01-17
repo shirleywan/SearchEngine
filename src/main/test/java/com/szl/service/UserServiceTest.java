@@ -1,9 +1,9 @@
-package com.luo.service;
+package com.szl.service;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.luo.baseTest.SpringTestCase;
-import com.luo.domain.User;
+import com.szl.baseTest.SpringTestCase;
+import com.szl.domain.User;
 /**
  * Created by zsc on 2017/1/15.
  */

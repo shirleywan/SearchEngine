@@ -1,11 +1,11 @@
-package com.luo.controller;
+package com.szl.controller;
 
 import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import com.luo.domain.User;
-import com.luo.service.UserService;
+import com.szl.domain.User;
+import com.szl.service.UserService;
 
 /**
  * Created by zsc on 2017/1/15.

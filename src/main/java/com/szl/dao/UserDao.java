@@ -1,6 +1,6 @@
-package com.luo.dao;
+package com.szl.dao;
 
-import com.luo.domain.User;
+import com.szl.domain.User;
 
 /**
  * Created by zsc on 2017/1/15.

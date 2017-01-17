@@ -1,7 +1,7 @@
-package com.luo.service;
+package com.szl.service;
 
-import com.luo.dao.UserDao;
-import com.luo.domain.User;
+import com.szl.dao.UserDao;
+import com.szl.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
-package com.luo.service;
+package com.szl.service;
 
-import com.luo.domain.User;
+import com.szl.domain.User;
 
 /**
  * Created by zsc on 2017/1/15.

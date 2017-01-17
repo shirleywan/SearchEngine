@@ -1,4 +1,4 @@
-package com.luo.domain;
+package com.szl.domain;
 
 /**
  * Created by zsc on 2017/1/15.
