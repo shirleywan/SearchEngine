@@ -2,4 +2,8 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <typeAliases>
+        <typeAlias alias="Forward" type="com.szl.domain.Forward"/>
+        <typeAlias alias="Reverse" type="com.szl.domain.Reverse"/>
+    </typeAliases>
 </configuration>

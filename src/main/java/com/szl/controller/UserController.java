@@ -1,6 +1,8 @@
 package com.szl.controller;
 
 import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -13,7 +15,7 @@ import com.szl.service.UserService;
 @Controller
 @RequestMapping("/zsc")
 public class UserController {
-    @Resource
+    @Autowired
     private UserService userService;
 
     @RequestMapping("/register")

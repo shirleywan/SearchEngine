@@ -60,6 +60,11 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.css</url-pattern>
+  </servlet-mapping>
+
   <!-- 错误跳转页面 -->
   <!--<error-page>-->
     <!--&lt;!&ndash; 路径不正确 &ndash;&gt;-->
