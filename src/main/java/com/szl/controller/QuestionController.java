@@ -2,7 +2,6 @@ package com.szl.controller;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
-import com.hankcs.hanlp.tokenizer.StandardTokenizer;
 import com.szl.Config;
 import com.szl.Filter;
 import com.szl.domain.Forward;
@@ -25,14 +24,14 @@ public class QuestionController {
     @Autowired
     private QuestionSearchService questionSearchService;
 
-    @RequestMapping("/search")
+    @RequestMapping("/")
     public String search() {
         return "searchForm";
     }
 
     //@RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
-    @RequestMapping("/question")
-    public ModelAndView getQuestions(@RequestParam(value="q") String questionStr){
+    @RequestMapping("/search")
+    public ModelAndView getQuestions(@RequestParam(value="type") String content, @RequestParam(value="q") String questionStr){
         ModelAndView mav = new ModelAndView("questionForm");
         List<Forward> forwards = genUrls(questionStr, questionSearchService.getfQuestionsMap(),  questionSearchService.getrQuestionsMap());
         mav.addObject("forwards", forwards);
@@ -61,7 +60,7 @@ public class QuestionController {
         }
 
         //得到最终排序
-        Set<String> urls = new LinkedHashSet<>();//保证按顺序且不重复
+        Set<String> urls = new LinkedHashSet<String>();//保证按顺序且不重复
         List<String> temp = new ArrayList<String>();
         int len = sortedUrls.size() + 1;
         for (int i = len - 1; i != 0; i--) {

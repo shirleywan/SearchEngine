@@ -17,6 +17,8 @@ import java.util.Map;
 
 /**
  * Created by zsc on 2017/1/18.
+ * 构造方法在@PostConstruct前执行
+
  */
 @Service
 public class QuestionSearchService implements SearchService {

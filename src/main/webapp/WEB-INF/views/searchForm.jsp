@@ -12,12 +12,13 @@
     <title>Search</title>
 </head>
 <body>
-<form action="question" method="get">
+<form action="search" method="get">
     <p>
+        <input type="hidden" name="type" value="content">
         <input type="text" name="q">
     </p>
 
-    <p >
+    <p>
         <button type="submit">提交</button>
     </p>
 </form>
