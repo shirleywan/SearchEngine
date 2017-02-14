@@ -14,7 +14,7 @@
 <body>
 <form action="search" method="get">
     <p>
-        <input type="hidden" name="type" value="content">
+        <input type="hidden" name="type" value="question">
         <input type="text" name="q">
     </p>
 

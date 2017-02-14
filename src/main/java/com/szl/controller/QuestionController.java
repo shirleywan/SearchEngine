@@ -31,14 +31,25 @@ public class QuestionController {
 
     //@RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
     @RequestMapping("/search")
-    public ModelAndView getQuestions(@RequestParam(value="type") String content, @RequestParam(value="q") String questionStr){
-        ModelAndView mav = new ModelAndView("questionForm");
-        List<Forward> forwards = genUrls(questionStr, questionSearchService.getfQuestionsMap(),  questionSearchService.getrQuestionsMap());
+    public ModelAndView getQuestions(@RequestParam(value="type") String type, @RequestParam(value="q") String questionStr){
+        ModelAndView mav;
+        List<Forward> forwards;
+        if (type.equals("question")) {
+            forwards = genUrls(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
+            mav = new ModelAndView("questionsResult");
+        } else if (type.equals("people")) {
+            forwards = genUrls(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
+            mav = new ModelAndView("peoplesResult");
+        } else {
+            forwards = genUrls(type, questionStr, questionSearchService.getfTopicsMap(),  questionSearchService.getrTopicsMap());
+            mav = new ModelAndView("topicsResult");
+        }
+        mav.addObject("q", questionStr);
         mav.addObject("forwards", forwards);
         return mav;
     }
 
-    private List<Forward> genUrls(String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {
+    private List<Forward> genUrls(String type, String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(HanLP.segment(str));
         for (int i = 0; i < terms.size(); i++) {
@@ -46,11 +57,23 @@ public class QuestionController {
         }
         List<Forward> forwards = new ArrayList<Forward>();
         List<Reverse> keyWords = new ArrayList<Reverse>();
-        for (Term term : terms) {
-            if (rQuestionsMap.containsKey(term.word)) {
-                keyWords.add(rQuestionsMap.get(term.word));
+        //此处有区别，使用type区分
+        if (type.equals("question")) {
+            for (Term term : terms) {
+                if (rQuestionsMap.containsKey(term.word)) {
+                    keyWords.add(rQuestionsMap.get(term.word));
+                }
+            }
+        } else {
+            for (Term term : terms) {
+                for (Map.Entry<String, Reverse> entry : rQuestionsMap.entrySet()) {
+                    if (entry.getKey().contains(term.word)) {
+                        keyWords.add(entry.getValue());
+                    }
+                }
             }
         }
+
         Collections.sort(keyWords);//按IDF大小排序
 
         //得到按序排列的url集合，只要string

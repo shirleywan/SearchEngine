@@ -3,8 +3,7 @@ package com.szl.service;
 import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.tokenizer.StandardTokenizer;
 import com.szl.Filter;
-import com.szl.dao.QuestionForwardDao;
-import com.szl.dao.QuestionReverseDao;
+import com.szl.dao.*;
 import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +26,45 @@ public class QuestionSearchService implements SearchService {
     private Map<String, Reverse> rQuestionsMap = new HashMap<String, Reverse>();
     private Map<String, Forward> fQuestionsMap = new HashMap<String, Forward>();
 
+    private List<Forward> fPeoples;
+    private List<Reverse> rPeoples;
+    private Map<String, Reverse> rPeoplesMap = new HashMap<String, Reverse>();
+    private Map<String, Forward> fPeoplesMap = new HashMap<String, Forward>();
+
+    private List<Forward> fTopics;
+    private List<Reverse> rTopics;
+    private Map<String, Reverse> rTopicsMap = new HashMap<String, Reverse>();
+    private Map<String, Forward> fTopicsMap = new HashMap<String, Forward>();
+
     @Autowired
     private QuestionForwardDao questionForwardDao;
 
     @Autowired
     private QuestionReverseDao questionReverseDao;
 
+    @Autowired
+    private PeopleForwardDao peopleForwardDao;
+
+    @Autowired
+    private PeopleReverseDao peopleReverseDao;
+
+    @Autowired
+    private TopicForwardDao topicForwardDao;
+
+    @Autowired
+    private TopicReverseDao topicReverseDao;
+
+
+
     @PostConstruct
     public void init() {
         System.out.println("@PostConstruct方法被调用");
         fQuestions = getFQuestions();
         rQuestions = getRQuestions();//将数据库的问题正排和倒排读进来
+        fPeoples = getFPeoples();
+        rPeoples = getRPeoples();
+        fTopics = getFTopics();
+        rTopics = getRTopics();
         //将2个表读到Map里
         for (Reverse question : rQuestions) {
             rQuestionsMap.put(question.getKeyWords(), question);
@@ -47,6 +74,24 @@ public class QuestionSearchService implements SearchService {
             fQuestionsMap.put(String.valueOf(question.getId()), question);
         }
         System.out.println(rQuestionsMap.size() + "     " + fQuestionsMap.size());
+
+        for (Reverse people : rPeoples) {
+            rPeoplesMap.put(people.getKeyWords(), people);
+        }
+
+        for (Forward people : fPeoples) {
+            fPeoplesMap.put(String.valueOf(people.getId()), people);
+        }
+        System.out.println(rPeoplesMap.size() + "     " + fPeoplesMap.size());
+
+        for (Reverse people : rTopics) {
+            rTopicsMap.put(people.getKeyWords(), people);
+        }
+
+        for (Forward people : fTopics) {
+            fTopicsMap.put(String.valueOf(people.getId()), people);
+        }
+        System.out.println(rTopicsMap.size() + "     " + fTopicsMap.size());
 
     }
 
@@ -73,4 +118,35 @@ public class QuestionSearchService implements SearchService {
         return questionReverseDao.selectAll();
     }
 
+    public Map<String, Forward> getfPeoplesMap() {
+        return fPeoplesMap;
+    }
+
+    public Map<String, Reverse> getrPeoplesMap() {
+        return rPeoplesMap;
+    }
+
+    private List<Forward> getFPeoples() {
+        return peopleForwardDao.selectAll();
+    }
+
+    private List<Reverse> getRPeoples() {
+        return peopleReverseDao.selectAll();
+    }
+
+    public Map<String, Forward> getfTopicsMap() {
+        return fTopicsMap;
+    }
+
+    public Map<String, Reverse> getrTopicsMap() {
+        return rTopicsMap;
+    }
+
+    private List<Forward> getFTopics() {
+        return topicForwardDao.selectAll();
+    }
+
+    private List<Reverse> getRTopics() {
+        return topicReverseDao.selectAll();
+    }
 }

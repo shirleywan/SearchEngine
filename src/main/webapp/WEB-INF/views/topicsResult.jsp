@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: zsc
-  Date: 2017/1/18
-  Time: 15:43
+  Date: 2017/2/14
+  Time: 15:17
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -14,7 +14,19 @@
 </head>
 <body>
 <div id="global">
-    <h1>Question List</h1>
+    <ul>
+        <li>
+            <%--使用<%=request.getContextPath()%>得到工程名SearchEngine--%>
+            <a href="<%=request.getContextPath()%>/search?type=question&q=${q}">内容</a>
+        </li>
+        <li>
+            <a href="<%=request.getContextPath()%>/search?type=people&q=${q}">用户</a>
+        </li>
+        <li>
+            <a href="<%=request.getContextPath()%>/search?type=topic&q=${q}">话题</a>
+        </li>
+    </ul>
+    <h1>Topic List</h1>
     <table>
         <tr>
             <th>ID</th>
