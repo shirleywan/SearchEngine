@@ -1,10 +1,12 @@
 package com.szl.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by zsc on 2016/12/22.
  * urls添加所有包含此关键词的序号
  */
-public class Reverse implements Comparable<Reverse>{
+public class Reverse implements Serializable, Comparable<Reverse>{
     private int id;
     private String keyWords;
     private String IDF;

@@ -20,6 +20,26 @@
         select * from topicf
     </select>
 
+    <select id="getPageCounts" resultType="long">
+        select count(*) from topicf where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--find_in_set暂时不可以，待解决-->
+    <!--将mybatis升级到3.4.2，否则index无法重置-->
+    <select id="selectByPage" resultMap="ForwardMap" >
+        select * from topicf where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by field
+        <foreach collection="list" item="item" open="(id," separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <insert id="insert" parameterType="Forward" useGeneratedKeys="true" keyProperty="id">
         insert into topicf(title,url,description,quality,keyWords)
         values(#{title},#{url},#{description},#{quality},#{keyWords})

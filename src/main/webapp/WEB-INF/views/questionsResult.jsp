@@ -42,6 +42,9 @@
                 <td><a href="${forward.url}"> ${forward.title}</a></td>
             </tr>
         </c:forEach>
+        <jsp:include page="page.jsp">
+            <jsp:param name="url" value="search?type=question&q=${q}" />
+        </jsp:include>
     </table>
 </div>
 </body>

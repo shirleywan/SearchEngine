@@ -12,6 +12,10 @@ public interface PeopleForwardDao {
 
     List<Forward> selectAll();
 
+    Long getPageCounts(List<Integer> Ids);
+
+    List<Forward> selectByPage(List<Integer> Ids);
+
     void insert(Forward forward);
 
     void update(Forward forward);

@@ -6,6 +6,7 @@ import com.szl.Filter;
 import com.szl.dao.*;
 import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
+import org.jsoup.select.Evaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,8 @@ import java.util.Map;
 /**
  * Created by zsc on 2017/1/18.
  * 构造方法在@PostConstruct前执行
-
+ * fQuestions和rQuestions是为了构建fQuestionsMap和rQuestionsMap，rQuestionsMap是用来查询，最终得到有序的结果url序号，
+ * 然后通过查询fQuestionsMap得到最终的url信息，可以将rQuestionsMap和fQuestionsMap整合，节省空间
  */
 @Service
 public class QuestionSearchService implements SearchService {
@@ -53,7 +55,6 @@ public class QuestionSearchService implements SearchService {
 
     @Autowired
     private TopicReverseDao topicReverseDao;
-
 
 
     @PostConstruct
@@ -149,4 +150,29 @@ public class QuestionSearchService implements SearchService {
     private List<Reverse> getRTopics() {
         return topicReverseDao.selectAll();
     }
+
+    public Long getQPageCounts(List<Integer> Ids) {
+        return questionForwardDao.getPageCounts(Ids);
+    }
+
+    public List<Forward> selectQByPage(List<Integer> Ids) {
+        return questionForwardDao.selectByPage(Ids);
+    }
+
+    public Long getPPageCounts(List<Integer> Ids) {
+        return peopleForwardDao.getPageCounts(Ids);
+    }
+
+    public List<Forward> selectPByPage(List<Integer> Ids) {
+        return peopleForwardDao.selectByPage(Ids);
+    }
+
+    public Long getTPageCounts(List<Integer> Ids) {
+        return topicForwardDao.getPageCounts(Ids);
+    }
+
+    public List<Forward> selectTByPage(List<Integer> Ids) {
+        return topicForwardDao.selectByPage(Ids);
+    }
+
 }

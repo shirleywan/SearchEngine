@@ -3,6 +3,7 @@ package com.szl.dao;
 import com.szl.domain.Forward;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zsc on 2016/12/21.
@@ -12,6 +13,10 @@ public interface QuestionForwardDao {
     Forward selectById(int Id);
 
     List<Forward> selectAll();
+
+    Long getPageCounts(List<Integer> Ids);
+
+    List<Forward> selectByPage(List<Integer> Ids);
 
     void insert(Forward forward);
 

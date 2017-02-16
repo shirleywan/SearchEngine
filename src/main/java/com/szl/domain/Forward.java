@@ -1,10 +1,12 @@
 package com.szl.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by zsc on 2016/12/20.
  * 仅用权重作比较
  */
-public class Forward implements Comparable<Forward>{
+public class Forward implements Serializable,Comparable<Forward>{
     private int id;
     private String title;//标题
     private String url;//网页地址
