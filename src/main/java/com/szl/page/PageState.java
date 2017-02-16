@@ -10,26 +10,32 @@ public enum PageState {
      * 设置每页显示多少条
      */
     SETPAGE,
+
     /**
      * 首页
      */
     FIRST,
+
     /**
      * 向前一页
      */
     PREVIOUS,
+
     /**
      * 向后一页
      */
     NEXT,
+
     /**
      * 末页
      */
     LAST,
+
     /**
      * 排序
      */
     SORT,
+
     /**
      * 到第多少页
      */
@@ -48,9 +54,7 @@ public enum PageState {
         String newValue = StringUtils.trim(value).toUpperCase();
         try {
             index = valueOf(newValue).ordinal();
-        } catch (IllegalArgumentException e) {
-
-        }
+        } catch (IllegalArgumentException e) {}
         return index;
     }
 }

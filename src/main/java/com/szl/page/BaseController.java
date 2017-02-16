@@ -21,7 +21,7 @@ public class BaseController {
         String value = request.getParameter("pageKey");
 
         /** 获取下标判断分页状态 */
-        int index = PageState.getOrdinal(pageAction);
+        int state = PageState.getOrdinal(pageAction);
 
         Page page = null;
         /**
@@ -31,10 +31,10 @@ public class BaseController {
          * */
         Page sessionPage = getPage(request);
 
-        if (index < 1) {
-            page = PageUtil.inintPage(totalCount, index, value, sessionPage);
+        if (state < 1) {
+            page = PageUtil.inintPage(totalCount, state, value, sessionPage);
         } else {
-            page = PageUtil.execPage(index, value, sessionPage);
+            page = PageUtil.execPage(state, value, sessionPage);
         }
         setSession(request, page);
         return page;

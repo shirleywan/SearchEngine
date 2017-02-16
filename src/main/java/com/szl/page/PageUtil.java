@@ -16,12 +16,12 @@ public class PageUtil {
      * 初始化分页类
      *
      * @param totalCount 总行数
-     * @param index      分页状态
+     * @param state      分页状态
      * @param value      只有在设置每页显示多少条时,值不会NULL,其它为NULL
      */
-    public static Page inintPage(Long totalCount, Integer index, String value, Page sessionPage) {
+    public static Page inintPage(Long totalCount, Integer state, String value, Page sessionPage) {
         Page page = null;
-        if (index < 0) {
+        if (state < 0) {
             page = new Page(totalCount);
         } else {
             /**每页显示多少条*/
@@ -38,13 +38,13 @@ public class PageUtil {
     /**
      * 当页点击：首页,前一页,后一页,末页,排序,到第多少页时进行分页操作
      *
-     * @param index 分页状态
+     * @param state 分页状态
      * @param value 排序字段名或者到第多少页
      */
-    public static Page execPage(int index, String value, Page sessionPage) {
+    public static Page execPage(int state, String value, Page sessionPage) {
         Page page = sessionPage;
         /**调用方法进行分页计算*/
-        page.pageState(index, value);
+        page.pageState(state, value);
         return page;
     }
 }

@@ -17,7 +17,7 @@ public class Page implements Serializable {//序列化用以保存到session中
     //后一页
     private Boolean hasNextPage;
 
-    //每页显示多少条:默认20条
+    //每页显示多少条:默认**条
     private Long everyPage = 1L;
 
     //总页数
@@ -83,8 +83,7 @@ public class Page implements Serializable {//序列化用以保存到session中
     }
 
 
-    public Page() {
-    }
+    public Page() {}
 
     /**
      * 常用,用于计算分页
@@ -107,9 +106,9 @@ public class Page implements Serializable {//序列化用以保存到session中
      * @param state 状态码
      * @param value 到第多少页或者设置每页显示多少条或者为排序列名
      */
-    public void pageState(int index, String value) {
+    public void pageState(int state, String value) {
         sort = false;
-        switch (index) {
+        switch (state) {
             case 0:
                 setEveryPage(Long.parseLong(value));
                 break;
@@ -228,9 +227,7 @@ public class Page implements Serializable {//序列化用以保存到session中
     }
 
     public void setTotalPage(Long totalPage) {
-        if (this.currentPage > totalPage) {
-            this.currentPage = totalPage;
-        }
+        this.currentPage = 1L;//BaseController中new Page(){}，为空，因此需要初始化currentPage，即setTotalCount在PageUtil中必须要有
         this.totalPage = totalPage;
     }
 

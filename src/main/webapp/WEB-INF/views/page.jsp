@@ -20,25 +20,21 @@
         当前第${page.currentPage}页 
         <c:choose>
             <c:when test="${page.hasPrePage eq false}">
-                <<首页 <上页 
+                <<首页 <上一页 
             </c:when>
             <c:otherwise>
-                <a href="${pathurl}&pageAction=first${urlParams}"><
-                    <首页
-                     </a> 
-                <a href="${pathurl}&pageAction=previous${urlParams}"/>
-                <上一页
-                </a>
+                <a href="${pathurl}&pageAction=gopage&pageKey=1${urlParams}"><<首页</a> 
+                <a href="${pathurl}&pageAction=gopage&pageKey=${((page.currentPage - 1) > 1)?(page.currentPage - 1) : 1}${urlParams}"/><上一页</a>
             </c:otherwise>
         </c:choose>
          || 
         <c:choose>
             <c:when test="${page.hasNextPage eq false}">
-                 下页> 尾页>>
+                 下一页> 末页>>
             </c:when>
             <c:otherwise>
-                <a href="${pathurl}&pageAction=next${urlParams}">下一页> </a> 
-                <a href="${pathurl}&pageAction=last${urlParams}">末页>></a>
+                <a href="${pathurl}&pageAction=gopage&pageKey=${((page.currentPage + 1) < page.totalCount)?(page.currentPage+1) : page.totalCount}${urlParams}">下一页> </a> 
+                <a href="${pathurl}&&pageAction=gopage&pageKey=${page.totalCount}${urlParams}">末页>></a>
             </c:otherwise>
         </c:choose>
          
