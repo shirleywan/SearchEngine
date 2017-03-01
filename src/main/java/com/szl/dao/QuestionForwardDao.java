@@ -1,6 +1,7 @@
 package com.szl.dao;
 
 import com.szl.domain.Forward;
+import com.szl.page.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ public interface QuestionForwardDao {
     Long getPageCounts(List<Integer> Ids);
 
     List<Forward> selectByPage(List<Integer> Ids);
+
+    List<Forward> selectByMap(Map<String, Object> map);
 
     void insert(Forward forward);
 

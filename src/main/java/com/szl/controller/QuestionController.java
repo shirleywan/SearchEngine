@@ -2,12 +2,12 @@ package com.szl.controller;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
-import com.szl.page.BaseController;
 import com.szl.Config;
 import com.szl.Filter;
 import com.szl.page.Page;
 import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
+import com.szl.page.PageUtil;
 import com.szl.service.QuestionSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ import java.util.*;
  */
 @Controller
 @SessionAttributes("forwards")
-public class QuestionController extends BaseController {
+public class QuestionController  {
 
     @Autowired
     private QuestionSearchService questionSearchService;
@@ -34,55 +34,57 @@ public class QuestionController extends BaseController {
         return "searchForm";
     }
 
-    //@RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
     @RequestMapping("/search")
     public ModelAndView getQuestions(HttpServletRequest request, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
         ModelAndView mav;
         List<Forward> forwards;
         List<Integer> allIds;
         List<Integer> everyIds = new ArrayList<Integer>();
-        Long totalCount;
+        Long totalCount = -1l;
         Page page;
-//        if (type.equals("question")) {
-//            forwards = genUrls(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
-//            mav = new ModelAndView("questionsResult");
-//        } else if (type.equals("people")) {
-//            forwards = genUrls(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
-//            mav = new ModelAndView("peoplesResult");
-//        } else {
-//            forwards = genUrls(type, questionStr, questionSearchService.getfTopicsMap(),  questionSearchService.getrTopicsMap());
-//            mav = new ModelAndView("topicsResult");
-//        }
+        Map<String, Object> map = new HashMap<String, Object>();
 
         if (type.equals("question")) {
             allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
-            totalCount = questionSearchService.getQPageCounts(allIds);
+//            totalCount = questionSearchService.getQPageCounts(allIds);
             //设置分页对象
-            page = executePage(request, totalCount);
+            page = PageUtil.executePage(request, totalCount);
             for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
                 everyIds.add(allIds.get((int) i));
             }
-            forwards = questionSearchService.selectQByPage(everyIds);
+            page.setAllIds(allIds);
+            page.setEveryIds(everyIds);
+            map.put("page", page);
+            map.put("request", request);
+            forwards = questionSearchService.selectQByMap(map);
             mav = new ModelAndView("questionsResult");
         } else if (type.equals("people")) {
             allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
-            totalCount = questionSearchService.getPPageCounts(allIds);
+//            totalCount = questionSearchService.getPPageCounts(allIds);
             //设置分页对象
-            page = executePage(request, totalCount);
+            page = PageUtil.executePage(request, totalCount);
             for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
                 everyIds.add(allIds.get((int) i));
             }
-            forwards = questionSearchService.selectPByPage(everyIds);
+            page.setAllIds(allIds);
+            page.setEveryIds(everyIds);
+            map.put("page", page);
+            map.put("request", request);
+            forwards = questionSearchService.selectPByMap(map);
             mav = new ModelAndView("peoplesResult");
         } else {
             allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
-            totalCount = questionSearchService.getTPageCounts(allIds);
+//            totalCount = questionSearchService.getTPageCounts(allIds);
             //设置分页对象
-            page = executePage(request, totalCount);
+            page = PageUtil.executePage(request, totalCount);
             for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
                 everyIds.add(allIds.get((int) i));
             }
-            forwards = questionSearchService.selectTByPage(everyIds);
+            page.setAllIds(allIds);
+            page.setEveryIds(everyIds);
+            map.put("page", page);
+            map.put("request", request);
+            forwards = questionSearchService.selectTByMap(map);
             mav = new ModelAndView("topicsResult");
         }
 
@@ -90,6 +92,71 @@ public class QuestionController extends BaseController {
         mav.addObject("forwards", forwards);
         return mav;
     }
+
+
+//    /**
+//     * 不使用插件
+//     * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
+//     * @param request
+//     * @param type
+//     * @param questionStr
+//     * @return
+//     */
+//    @RequestMapping("/search")
+//    public ModelAndView getQuestions(HttpServletRequest request, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
+//        ModelAndView mav;
+//        List<Forward> forwards;
+//        List<Integer> allIds;
+//        List<Integer> everyIds = new ArrayList<Integer>();
+//        Long totalCount;
+//        Page page;
+////        if (type.equals("question")) {
+////            forwards = genUrls(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
+////            mav = new ModelAndView("questionsResult");
+////        } else if (type.equals("people")) {
+////            forwards = genUrls(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
+////            mav = new ModelAndView("peoplesResult");
+////        } else {
+////            forwards = genUrls(type, questionStr, questionSearchService.getfTopicsMap(),  questionSearchService.getrTopicsMap());
+////            mav = new ModelAndView("topicsResult");
+////        }
+//
+//        if (type.equals("question")) {
+//            allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
+//            totalCount = questionSearchService.getQPageCounts(allIds);
+//            //设置分页对象
+//            page = PageUtil.executePage(request, totalCount);
+//            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
+//                everyIds.add(allIds.get((int) i));
+//            }
+//            forwards = questionSearchService.selectQByPage(everyIds);
+//            mav = new ModelAndView("questionsResult");
+//        } else if (type.equals("people")) {
+//            allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
+//            totalCount = questionSearchService.getPPageCounts(allIds);
+//            //设置分页对象
+//            page = PageUtil.executePage(request, totalCount);
+//            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
+//                everyIds.add(allIds.get((int) i));
+//            }
+//            forwards = questionSearchService.selectPByPage(everyIds);
+//            mav = new ModelAndView("peoplesResult");
+//        } else {
+//            allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
+//            totalCount = questionSearchService.getTPageCounts(allIds);
+//            //设置分页对象
+//            page = PageUtil.executePage(request, totalCount);
+//            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
+//                everyIds.add(allIds.get((int) i));
+//            }
+//            forwards = questionSearchService.selectTByPage(everyIds);
+//            mav = new ModelAndView("topicsResult");
+//        }
+//
+//        mav.addObject("q", questionStr);
+//        mav.addObject("forwards", forwards);
+//        return mav;
+//    }
 
 
     private List<Integer> genIds(String type, String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {

@@ -4,9 +4,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zsc on 2017/2/15.
+ * 必须保存到session中，以供jsp调用
  */
 public class Page implements Serializable {//序列化用以保存到session中
     private static final long serialVersionUID = 1L;
@@ -33,7 +38,7 @@ public class Page implements Serializable {//序列化用以保存到session中
     private Long endinIndex;
 
     //总共多少条
-    private Long totalCount;
+    private Long totalCount = -1l;
 
     //排序列名
     private String sortName;
@@ -82,6 +87,43 @@ public class Page implements Serializable {//序列化用以保存到session中
         this.sortState = sortState;
     }
 
+
+    /**
+     * 插件新增变量和方法
+     */
+    private Map<String, Object> params = new HashMap<String, Object>();//其他的参数我们把它分装成一个Map对象
+
+    private List<Integer> allIds = new ArrayList<Integer>();
+
+    private List<Integer> everyIds = new ArrayList<Integer>();
+
+    public List<Integer> getAllIds() {
+        return allIds;
+    }
+
+    public void setAllIds(List<Integer> allIds) {
+        this.allIds = allIds;
+    }
+
+    public List<Integer> getEveryIds() {
+        return everyIds;
+    }
+
+    public void setEveryIds(List<Integer> everyIds) {
+        this.everyIds = everyIds;
+    }
+
+    public Map<String, Object> getParams() {
+        return params;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
+    }
+
+    /**
+     * end
+     */
 
     public Page() {}
 
@@ -213,6 +255,7 @@ public class Page implements Serializable {//序列化用以保存到session中
         this.hasNextPage = hasNextPage;
     }
 
+    //EL表达式page.hasPrePage调用此方法！！！ 在page.jsp中<c:when test="${page.hasPrePage eq false}">
     public Boolean getHasPrePage() {
         this.hasPrePage = currentPage != 1;
         return this.hasPrePage;

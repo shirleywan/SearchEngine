@@ -42,7 +42,7 @@
             </tr>
         </c:forEach>
         <jsp:include page="page.jsp">
-            <jsp:param name="url" value="search?type=people&q=${q}" />
+            <jsp:param name="url" value="search?type=people&q=${q}"/>
         </jsp:include>
     </table>
 </div>

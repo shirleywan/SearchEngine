@@ -6,4 +6,11 @@
         <typeAlias alias="Forward" type="com.szl.domain.Forward"/>
         <typeAlias alias="Reverse" type="com.szl.domain.Reverse"/>
     </typeAliases>
+
+    <!--不使用插件时需要注释-->
+    <plugins>
+        <plugin interceptor="com.szl.page.PageInterceptor">
+            <property name="databaseType" value="mysql"/>
+        </plugin>
+    </plugins>
 </configuration>

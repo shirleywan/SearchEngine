@@ -9,12 +9,12 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by zsc on 2017/2/26.
@@ -42,16 +42,36 @@ public class PageInterceptor implements Interceptor {
         //拿到当前绑定Sql的参数对象，就是我们在调用对应的Mapper映射语句时所传入的参数对象
         Object obj = boundSql.getParameterObject();
         //这里我们简单的通过传入的是Page对象就认定它是需要进行分页操作的。
-        if (obj instanceof Page) {
-            Page page = (Page) obj;
+        if (obj instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) obj;
             //通过反射获取delegate父类BaseStatementHandler的mappedStatement属性
             MappedStatement mappedStatement = (MappedStatement)ReflectUtil.getFieldValue(delegate, "mappedStatement");
             //拦截到的prepare方法参数是一个Connection对象
             Connection connection = (Connection)invocation.getArgs()[0];
             //获取当前要执行的Sql语句，也就是我们直接在Mapper映射语句中写的Sql语句
             String sql = boundSql.getSql();
-            //给当前的page参数对象设置总记录数
-            this.setTotalRecord(page, mappedStatement, connection);
+
+
+            //得到map
+            Page page = null;
+            HttpServletRequest request = null;
+            Set<String> keySet = map.keySet();
+            Iterator<String> iterator = keySet.iterator();
+            while(iterator.hasNext()) {
+                String key = iterator.next();
+                Object value = map.get(key);
+                if (value instanceof Page) {
+                    page =  (Page) value;
+                }
+                if (value instanceof HttpServletRequest) {
+                    request = (HttpServletRequest) value;
+                }
+            }
+            //设置页面跳转不需要设置最大值
+            if (page.getTotalCount() == -1l) {
+                //给当前的page参数对象设置总记录数
+                this.setTotalRecord(request, page, mappedStatement, connection);
+            }
             //获取分页Sql语句
             String pageSql = this.getPageSql(page, sql);
             //利用反射设置当前BoundSql对应的sql属性为我们建立好的分页Sql语句
@@ -67,7 +87,7 @@ public class PageInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-
+        this.databaseType = properties.getProperty("databaseType");
     }
 
     /**
@@ -96,9 +116,12 @@ public class PageInterceptor implements Interceptor {
      */
     private String getMysqlPageSql(Page page, StringBuffer sqlBuffer) {
         //计算第一条记录的位置，Mysql中记录的位置是从0开始的。
-        StringBuilder sb = new StringBuilder();
-
-//        sqlBuffer.append(" where id in ").append(offset).append(",").append(page.getPageSize());
+        String num = page.getEveryIds().toString().substring(1, page.getEveryIds().toString().length() - 1);
+        StringBuilder sb1 = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+        sb1.append("(").append(num).append(")");
+        sb2.append("(id,").append(num).append(")");
+        sqlBuffer.append(" where id in ").append(sb1).append(" order by field ").append(sb2);
         return sqlBuffer.toString();
     }
 
@@ -125,14 +148,14 @@ public class PageInterceptor implements Interceptor {
      * @param mappedStatement Mapper映射语句
      * @param connection 当前的数据库连接
      */
-    private void setTotalRecord(Page page, MappedStatement mappedStatement, Connection connection) {
+    private void setTotalRecord(HttpServletRequest request, Page page, MappedStatement mappedStatement, Connection connection) {
         //获取对应的BoundSql，这个BoundSql其实跟我们利用StatementHandler获取到的BoundSql是同一个对象。
         //delegate里面的boundSql也是通过mappedStatement.getBoundSql(paramObj)方法获取到的。
         BoundSql boundSql = mappedStatement.getBoundSql(page);
         //获取到我们自己写在Mapper映射语句中对应的Sql语句
         String sql = boundSql.getSql();
         //通过查询Sql语句获取到对应的计算总记录数的sql语句
-        String countSql = this.getCountSql(sql);
+        String countSql = this.getCountSql(page, sql);
         //通过BoundSql获取对应的参数映射
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         //利用Configuration、查询记录数的Sql语句countSql、参数映射关系parameterMappings和参数对象page建立查询记录数对应的BoundSql对象。
@@ -150,8 +173,10 @@ public class PageInterceptor implements Interceptor {
             rs = pstmt.executeQuery();
             if (rs.next()) {
                 int totalRecord = rs.getInt(1);
+                System.out.println("totalRecord.... " + totalRecord);
                 //给当前的参数page对象设置总记录数
                 page.setTotalCount(Long.valueOf(totalRecord));
+                PageUtil.setSession(request, page);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -170,10 +195,13 @@ public class PageInterceptor implements Interceptor {
     /**
      * 根据原Sql语句获取对应的查询总记录数的Sql语句
      * @param sql
+     * select count(1) from (select * from user where id in (14,15,16)) as temp;
      * @return
      */
-    private String getCountSql(String sql) {
-
-        return "select count(1) from (" + sql + ") as temp";
+    private String getCountSql(Page page, String sql) {
+        String num = page.getAllIds().toString().substring(1, page.getAllIds().toString().length() - 1);
+        StringBuilder sb = new StringBuilder();
+        sb.append("select count(1) from (").append(sql).append(" where id in (").append(num).append(")) as temp");
+        return sb.toString();
     }
 }

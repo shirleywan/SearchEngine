@@ -6,7 +6,6 @@ import com.szl.Filter;
 import com.szl.dao.*;
 import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
-import org.jsoup.select.Evaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -173,6 +172,19 @@ public class QuestionSearchService implements SearchService {
 
     public List<Forward> selectTByPage(List<Integer> Ids) {
         return topicForwardDao.selectByPage(Ids);
+    }
+
+    //分页插件
+    public List<Forward> selectQByMap(Map<String, Object> map) {
+        return questionForwardDao.selectByMap(map);
+    }
+
+    public List<Forward> selectPByMap(Map<String, Object> map) {
+        return peopleForwardDao.selectByMap(map);
+    }
+
+    public List<Forward> selectTByMap(Map<String, Object> map) {
+        return topicForwardDao.selectByMap(map);
     }
 
 }
