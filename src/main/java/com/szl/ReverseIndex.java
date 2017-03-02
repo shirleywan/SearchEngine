@@ -13,6 +13,7 @@ import java.util.*;
 
 /**
  * Created by zsc on 2016/12/17.
+ * 从IndexAndSort复制，以IndexAndSort为准
  * 建立倒排索引
  */
 public class ReverseIndex {
@@ -54,10 +55,12 @@ public class ReverseIndex {
         int size = questionsMap.size();
         for (Map.Entry<String, TreeSet<Forward>> entry : questionsMap.entrySet()) {
             rQuestions.setKeyWords(entry.getKey());
-            rQuestions.setIDF(String.format("%.2f", Math.log10((double) (size / entry.getValue().size()))));
+            rQuestions.setIDF(String.format("%.2f", Math.log((double) (size / entry.getValue().size())) / Math.log(2)));
             StringBuilder stringBuilder = new StringBuilder();
+            //urls表示为89，阿里巴巴，0.33DELIMITER88，阿里巴巴，0.25
             for (Forward forward : entry.getValue()) {
-                stringBuilder.append(forward.getId()).append(Config.DELIMITER);
+                stringBuilder.append(forward.getId()).append(",").append(entry.getKey()).append(",").
+                        append(forward.getTF()).append(",").append(rQuestions.getIDF()).append(Config.DELIMITER);
             }
             rQuestions.setUrls(stringBuilder.toString().substring(0, stringBuilder.toString().lastIndexOf(Config.DELIMITER)));
             insertQuestion(rQuestions);
@@ -79,7 +82,7 @@ public class ReverseIndex {
         int size = peoplesMap.size();
         for (Map.Entry<String, TreeSet<Forward>> entry : peoplesMap.entrySet()) {
             rPeoples.setKeyWords(entry.getKey());
-            rPeoples.setIDF(String.format("%.2f", Math.log10((double) (size / entry.getValue().size()))));
+            rPeoples.setIDF(String.format("%.2f", Math.log((double) (size / entry.getValue().size())) / Math.log(2)));
             StringBuilder stringBuilder = new StringBuilder();
             for (Forward forward : entry.getValue()) {
                 stringBuilder.append(forward.getId()).append(Config.DELIMITER);
@@ -102,7 +105,7 @@ public class ReverseIndex {
         int size = topicsMap.size();
         for (Map.Entry<String, TreeSet<Forward>> entry : topicsMap.entrySet()) {
             rTopics.setKeyWords(entry.getKey());
-            rTopics.setIDF(String.format("%.2f", Math.log10((double) (size / entry.getValue().size()))));
+            rTopics.setIDF(String.format("%.2f", Math.log((double) (size / entry.getValue().size())) / Math.log(2)));
             StringBuilder stringBuilder = new StringBuilder();
             for (Forward forward : entry.getValue()) {
                 stringBuilder.append(forward.getId()).append(Config.DELIMITER);

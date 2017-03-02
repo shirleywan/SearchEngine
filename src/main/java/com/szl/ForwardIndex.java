@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by zsc on 2016/12/17.
+ * 从IndexAndSort复制，以IndexAndSort为准
  * 建立正向排序表，分词前要将专用名词存入字典，人名、组织名、收藏夹、书、话题，分词只针对问题和圆桌
  */
 public class ForwardIndex {
@@ -82,12 +83,14 @@ public class ForwardIndex {
         int quality = -1;
         List<String> keyWordsTerm;
         String keyWords;
+        String TF;
         if (questionMatcher.matches()) {
             quality = Integer.valueOf(doc.select("div.zh-question-followers-sidebar").select("strong").text());//问题关注数（Jsoup）
             keyWordsTerm = HanLP.extractKeyword(title.split("-")[0].trim(), 10);
             keyWords = ListToString(keyWordsTerm);
             description = title;
-            this.question.add(new Forward(title, url, description, quality, keyWords));
+            TF = String.format("%.2f",(double) 1 / keyWords.split(",").length);
+            this.question.add(new Forward(title, url, description, quality, keyWords, TF));
             System.out.println("question " + quality);
         } else if (collectionMatcher.matches()) {
             quality = Integer.valueOf(doc.select("a[data-za-l=collection_followers_count]").text());//收藏关注数

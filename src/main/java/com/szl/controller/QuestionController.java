@@ -95,7 +95,7 @@ public class QuestionController  {
 
 
 //    /**
-//     * 不使用插件
+//     * 不使用插件，注释mybatis-config代码
 //     * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
 //     * @param request
 //     * @param type
@@ -196,20 +196,26 @@ public class QuestionController  {
         Set<String> urls = new LinkedHashSet<String>();//保证按顺序且不重复
         List<String> temp = new ArrayList<String>();
         int len = sortedUrls.size() + 1;
-        for (int i = len - 1; i != 0; i--) {
-            genInSequence(urls, sortedUrls, 0, i, temp);
+        if (type.equals("question")) {
+            for (int i = len - 1; i != 0; i--) {
+                genQInSequence(urls, sortedUrls, 0, i, temp);
+            }
+        } else {
+            for (int i = len - 1; i != 0; i--) {
+                genInSequence(urls, sortedUrls, 0, i, temp);
+            }
         }
 
         //显示结果
         System.out.println("最终url: " + urls);
         for (String url : urls) {
             ids.add(Integer.parseInt(url));
-
         }
 
         return ids;
     }
 
+    //返回List<Forward>，@Deprecated
     private List<Forward> genUrls(String type, String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(HanLP.segment(str));
@@ -264,6 +270,7 @@ public class QuestionController  {
         return forwards;
     }
 
+    //非问题递归获取全组合，并返回求交集后的结果
     private void genInSequence(Set<String> urls, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
         if (len == 0) {
             List<String> result = new ArrayList<>();
@@ -281,5 +288,77 @@ public class QuestionController  {
         genInSequence(urls, sortedUrls, start + 1, len - 1, temp);
         temp.remove(temp.size() - 1);
         genInSequence(urls, sortedUrls, start + 1, len, temp);
+    }
+
+    //问题递归获取全组合，并返回求交集后的结果
+    private void genQInSequence(Set<String> urls, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
+        if (len == 0) {
+            List<TF_IDF> result = new ArrayList<TF_IDF>();
+            for (int i = 0; i < Arrays.asList(temp.get(0).split(Config.DELIMITER)).size(); i++) {
+                TF_IDF tf_idf = new TF_IDF(Arrays.asList(temp.get(0).split(Config.DELIMITER)).get(i));
+                result.add(tf_idf);
+            }
+            for (int i = 1; i < temp.size(); i++) {
+                List<TF_IDF> result2 = new ArrayList<TF_IDF>();//后面的存到一个数组里，与result求交
+                for (int j = 0; j < Arrays.asList(temp.get(i).split(Config.DELIMITER)).size(); j++) {
+                    TF_IDF tf_idf = new TF_IDF(Arrays.asList(temp.get(i).split(Config.DELIMITER)).get(j));
+                    result2.add(tf_idf);
+                }
+                result.retainAll(result2);
+            }
+            Collections.sort(result);
+            System.out.println(result.toString());
+            for (int i = 0; i < result.size(); i++) {
+                urls.add(result.get(i).getUrl());
+            }
+//            urls.addAll(result);
+            return;
+        }
+        if (start == sortedUrls.size()) {
+            return;
+        }
+        temp.add(sortedUrls.get(start));
+        genQInSequence(urls, sortedUrls, start + 1, len - 1, temp);
+        temp.remove(temp.size() - 1);
+        genQInSequence(urls, sortedUrls, start + 1, len, temp);
+    }
+
+    class TF_IDF implements Comparable<TF_IDF>{
+        private double TF;
+        private double IDF;
+        private String url;
+
+        public String getUrl() {
+            return url;
+        }
+
+        TF_IDF(String str) {
+            this.url = str.split(",")[0];
+            this.TF = Double.parseDouble(str.split(",")[2]);
+            this.IDF = Double.parseDouble(str.split(",")[3]);
+        }
+
+        @Override
+        public String toString() {
+            return url.toString();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return url.equals(((TF_IDF) obj).getUrl());
+        }
+
+        @Override
+        public int hashCode() {
+            return url.hashCode();
+        }
+
+        //升序！！！
+        @Override
+        public int compareTo(TF_IDF object) {
+            String str1 = String.valueOf(TF * IDF);
+            String str2 = String.valueOf(object.TF * object.IDF);
+            return -str1.compareTo(str2);
+        }
     }
 }
