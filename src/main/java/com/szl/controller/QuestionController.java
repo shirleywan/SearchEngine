@@ -26,6 +26,8 @@ import java.util.*;
 @SessionAttributes("forwards")
 public class QuestionController  {
 
+    private HashMap<String, List<Integer>> cache = new HashMap<String, List<Integer>>();
+
     @Autowired
     private QuestionSearchService questionSearchService;
 
@@ -45,7 +47,14 @@ public class QuestionController  {
         Map<String, Object> map = new HashMap<String, Object>();
 
         if (type.equals("question")) {
-            allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
+            if (cache.containsKey(questionStr)) {
+                allIds = cache.get(questionStr);
+                System.out.println("从缓存里取");
+            } else {
+                allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
+                cache.put(questionStr, allIds);
+                System.out.println("重新计算");
+            }
 //            totalCount = questionSearchService.getQPageCounts(allIds);
             //设置分页对象
             page = PageUtil.executePage(request, totalCount);
@@ -59,7 +68,14 @@ public class QuestionController  {
             forwards = questionSearchService.selectQByMap(map);
             mav = new ModelAndView("questionsResult");
         } else if (type.equals("people")) {
-            allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
+            if (cache.containsKey(questionStr)) {
+                allIds = cache.get(questionStr);
+                System.out.println("从缓存里取");
+            } else {
+                allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
+                cache.put(questionStr, allIds);
+                System.out.println("重新计算");
+            }
 //            totalCount = questionSearchService.getPPageCounts(allIds);
             //设置分页对象
             page = PageUtil.executePage(request, totalCount);
@@ -73,7 +89,14 @@ public class QuestionController  {
             forwards = questionSearchService.selectPByMap(map);
             mav = new ModelAndView("peoplesResult");
         } else {
-            allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
+            if (cache.containsKey(questionStr)) {
+                allIds = cache.get(questionStr);
+                System.out.println("从缓存里取");
+            } else {
+                allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
+                cache.put(questionStr, allIds);
+                System.out.println("重新计算");
+            }
 //            totalCount = questionSearchService.getTPageCounts(allIds);
             //设置分页对象
             page = PageUtil.executePage(request, totalCount);
