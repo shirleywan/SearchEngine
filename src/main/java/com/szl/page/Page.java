@@ -290,12 +290,16 @@ public class Page implements Serializable {//序列化用以保存到session中
     }
 
     public Long getSubEndinIndex() {
-        if (currentPage < 6) {
-            subEndinIndex = 8L;
-        } else if (currentPage > (totalPage - 5)) {
-            subEndinIndex = totalPage - 1;
+        if (totalPage < 9) {
+            subEndinIndex = Math.min(totalPage - 1, 7L);
         } else {
-            subEndinIndex = currentPage + 3;
+            if (currentPage < 6) {
+                subEndinIndex = 8L;
+            } else if (currentPage > (totalPage - 5)) {
+                subEndinIndex = totalPage - 1;
+            } else {
+                subEndinIndex = currentPage + 3;
+            }
         }
         return subEndinIndex;
     }
@@ -305,12 +309,16 @@ public class Page implements Serializable {//序列化用以保存到session中
     }
 
     public Long getSubBeginIndex() {
-        if (currentPage < 6) {
+        if (totalPage < 9) {
             subBeginIndex = 2L;
-        } else if (currentPage > (totalPage - 5)) {
-            subBeginIndex = totalPage - 7;
         } else {
-            subBeginIndex = currentPage - 3;
+            if (currentPage < 6) {
+                subBeginIndex = 2L;
+            } else if (currentPage > (totalPage - 5)) {
+                subBeginIndex = totalPage - 7;
+            } else {
+                subBeginIndex = currentPage - 3;
+            }
         }
         return subBeginIndex;
     }
