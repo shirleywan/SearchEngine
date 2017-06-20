@@ -22,8 +22,8 @@ public class Page implements Serializable {//序列化用以保存到session中
     //后一页
     private Boolean hasNextPage;
 
-    //每页显示多少条:默认**条
-    private Long everyPage = 1L;
+    //每页显示多少条:默认10条
+    private Long everyPage = 10L;
 
     //总页数
     private Long totalPage;
@@ -36,6 +36,12 @@ public class Page implements Serializable {//序列化用以保存到session中
 
     //结束下标
     private Long endinIndex;
+
+    //中间下标
+    private Long subBeginIndex;
+
+    //中间结束下标
+    private Long subEndinIndex;
 
     //总共多少条
     private Long totalCount = -1l;
@@ -281,6 +287,36 @@ public class Page implements Serializable {//序列化用以保存到session中
     public void setTotalCount(Long totalCount) {
         setTotalPage(getTotalPage(totalCount));
         this.totalCount = totalCount;
+    }
+
+    public Long getSubEndinIndex() {
+        if (currentPage < 6) {
+            subEndinIndex = 8L;
+        } else if (currentPage > (totalPage - 5)) {
+            subEndinIndex = totalPage - 1;
+        } else {
+            subEndinIndex = currentPage + 3;
+        }
+        return subEndinIndex;
+    }
+
+    public void setSubEndinIndex(Long subEndinIndex) {
+        this.subEndinIndex = subEndinIndex;
+    }
+
+    public Long getSubBeginIndex() {
+        if (currentPage < 6) {
+            subBeginIndex = 2L;
+        } else if (currentPage > (totalPage - 5)) {
+            subBeginIndex = totalPage - 7;
+        } else {
+            subBeginIndex = currentPage - 3;
+        }
+        return subBeginIndex;
+    }
+
+    public void setSubBeginIndex(Long subBeginIndex) {
+        this.subBeginIndex = subBeginIndex;
     }
 
     @Override
