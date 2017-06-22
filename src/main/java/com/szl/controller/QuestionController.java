@@ -24,7 +24,7 @@ import java.util.*;
  */
 @Controller
 @SessionAttributes("forwards")
-public class QuestionController  {
+public class QuestionController {
 
     private HashMap<String, List<Integer>> cache = new HashMap<String, List<Integer>>();
 
@@ -36,143 +36,78 @@ public class QuestionController  {
         return "searchForm";
     }
 
-    @RequestMapping("/search")
-    public ModelAndView getQuestions(HttpServletRequest request, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
-        ModelAndView mav;
-        List<Forward> forwards;
-        List<Integer> allIds;
-        List<Integer> everyIds = new ArrayList<Integer>();
-        Long totalCount = -1l;
-        Page page;
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        if (type.equals("question")) {
-            if (cache.containsKey(questionStr)) {
-                allIds = cache.get(questionStr);
-                System.out.println("从缓存里取");
-            } else {
-                allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
-                cache.put(questionStr, allIds);
-                System.out.println("重新计算");
-            }
-//            totalCount = questionSearchService.getQPageCounts(allIds);
-            //设置分页对象
-            page = PageUtil.executePage(request, totalCount);
-            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
-                everyIds.add(allIds.get((int) i));
-            }
-            page.setAllIds(allIds);
-            page.setEveryIds(everyIds);
-            map.put("page", page);
-            map.put("request", request);
-            forwards = questionSearchService.selectQByMap(map);
-            mav = new ModelAndView("questionsResult");
-        } else if (type.equals("people")) {
-            if (cache.containsKey(questionStr)) {
-                allIds = cache.get(questionStr);
-                System.out.println("从缓存里取");
-            } else {
-                allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
-                cache.put(questionStr, allIds);
-                System.out.println("重新计算");
-            }
-//            totalCount = questionSearchService.getPPageCounts(allIds);
-            //设置分页对象
-            page = PageUtil.executePage(request, totalCount);
-            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
-                everyIds.add(allIds.get((int) i));
-            }
-            page.setAllIds(allIds);
-            page.setEveryIds(everyIds);
-            map.put("page", page);
-            map.put("request", request);
-            forwards = questionSearchService.selectPByMap(map);
-            mav = new ModelAndView("peoplesResult");
-        } else {
-            if (cache.containsKey(questionStr)) {
-                allIds = cache.get(questionStr);
-                System.out.println("从缓存里取");
-            } else {
-                allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
-                cache.put(questionStr, allIds);
-                System.out.println("重新计算");
-            }
-//            totalCount = questionSearchService.getTPageCounts(allIds);
-            //设置分页对象
-            page = PageUtil.executePage(request, totalCount);
-            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
-                everyIds.add(allIds.get((int) i));
-            }
-            page.setAllIds(allIds);
-            page.setEveryIds(everyIds);
-            map.put("page", page);
-            map.put("request", request);
-            forwards = questionSearchService.selectTByMap(map);
-            mav = new ModelAndView("topicsResult");
-        }
-
-        mav.addObject("q", questionStr);
-        mav.addObject("forwards", forwards);
-        return mav;
-    }
-
-
-//    /**
-//     * 不使用插件，注释mybatis-config代码
-//     * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
-//     * @param request
-//     * @param type
-//     * @param questionStr
-//     * @return
-//     */
 //    @RequestMapping("/search")
 //    public ModelAndView getQuestions(HttpServletRequest request, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
 //        ModelAndView mav;
 //        List<Forward> forwards;
 //        List<Integer> allIds;
 //        List<Integer> everyIds = new ArrayList<Integer>();
-//        Long totalCount;
+//        Long totalCount = -1l;
 //        Page page;
-////        if (type.equals("question")) {
-////            forwards = genUrls(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
-////            mav = new ModelAndView("questionsResult");
-////        } else if (type.equals("people")) {
-////            forwards = genUrls(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
-////            mav = new ModelAndView("peoplesResult");
-////        } else {
-////            forwards = genUrls(type, questionStr, questionSearchService.getfTopicsMap(),  questionSearchService.getrTopicsMap());
-////            mav = new ModelAndView("topicsResult");
-////        }
+//        Map<String, Object> map = new HashMap<String, Object>();
 //
 //        if (type.equals("question")) {
-//            allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
-//            totalCount = questionSearchService.getQPageCounts(allIds);
+//            if (cache.containsKey(questionStr)) {
+//                allIds = cache.get(questionStr);
+//                System.out.println("从缓存里取");
+//            } else {
+//                allIds = genIds(type, questionStr, questionSearchService.getfQuestionsMap(), questionSearchService.getrQuestionsMap());
+//                cache.put(questionStr, allIds);
+//                System.out.println("重新计算");
+//            }
+////            totalCount = questionSearchService.getQPageCounts(allIds);
 //            //设置分页对象
 //            page = PageUtil.executePage(request, totalCount);
 //            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
 //                everyIds.add(allIds.get((int) i));
 //            }
-//            forwards = questionSearchService.selectQByPage(everyIds);
+//            page.setAllIds(allIds);
+//            page.setEveryIds(everyIds);
+//            map.put("page", page);
+//            map.put("request", request);
+//            forwards = questionSearchService.selectQByMap(map);
 //            mav = new ModelAndView("questionsResult");
 //        } else if (type.equals("people")) {
-//            allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
-//            totalCount = questionSearchService.getPPageCounts(allIds);
+//            if (cache.containsKey(questionStr)) {
+//                allIds = cache.get(questionStr);
+//                System.out.println("从缓存里取");
+//            } else {
+//                allIds = genIds(type, questionStr, questionSearchService.getfPeoplesMap(), questionSearchService.getrPeoplesMap());
+//                cache.put(questionStr, allIds);
+//                System.out.println("重新计算");
+//            }
+////            totalCount = questionSearchService.getPPageCounts(allIds);
 //            //设置分页对象
 //            page = PageUtil.executePage(request, totalCount);
 //            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
 //                everyIds.add(allIds.get((int) i));
 //            }
-//            forwards = questionSearchService.selectPByPage(everyIds);
+//            page.setAllIds(allIds);
+//            page.setEveryIds(everyIds);
+//            map.put("page", page);
+//            map.put("request", request);
+//            forwards = questionSearchService.selectPByMap(map);
 //            mav = new ModelAndView("peoplesResult");
 //        } else {
-//            allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
-//            totalCount = questionSearchService.getTPageCounts(allIds);
+//            if (cache.containsKey(questionStr)) {
+//                allIds = cache.get(questionStr);
+//                System.out.println("从缓存里取");
+//            } else {
+//                allIds = genIds(type, questionStr, questionSearchService.getfTopicsMap(), questionSearchService.getrTopicsMap());
+//                cache.put(questionStr, allIds);
+//                System.out.println("重新计算");
+//            }
+////            totalCount = questionSearchService.getTPageCounts(allIds);
 //            //设置分页对象
 //            page = PageUtil.executePage(request, totalCount);
 //            for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
 //                everyIds.add(allIds.get((int) i));
 //            }
-//            forwards = questionSearchService.selectTByPage(everyIds);
+//            page.setAllIds(allIds);
+//            page.setEveryIds(everyIds);
+//            map.put("page", page);
+//            map.put("request", request);
+//            forwards = questionSearchService.selectTByMap(map);
 //            mav = new ModelAndView("topicsResult");
 //        }
 //
@@ -182,7 +117,99 @@ public class QuestionController  {
 //    }
 
 
-    private List<Integer> genIds(String type, String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {
+    /**
+     * 不使用插件，注释mybatis-config代码
+     *
+     * @param request
+     * @param type
+     * @param questionStr
+     * @return
+     * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
+     */
+    @RequestMapping("/search")
+    public ModelAndView getQuestions(HttpServletRequest request, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
+        ModelAndView mav = null;
+        List<Forward> forwards = null;
+        List<Forward> sortedForwards = null;
+        List<QualitySort> quality = null;
+        List<Integer> allIds = null;
+        List<Integer> sortedIds = null;
+        List<Integer> everyIds = new ArrayList<Integer>();
+        List<Integer> sortedEveryIds = new ArrayList<Integer>();
+        Long totalCount = -1L;
+        Page page = null;
+
+        if (type.equals("question")) {
+            quality = new ArrayList<QualitySort>();
+            sortedIds = new ArrayList<Integer>();
+            allIds = genIds(type, questionStr, quality, questionSearchService.getrQuestionsMap());
+            Collections.sort(quality);
+            for (QualitySort url : quality) {
+                sortedIds.add(Integer.parseInt(url.getUrl()));
+            }
+            if (allIds.size() > 0) {
+                totalCount = questionSearchService.getQPageCounts(allIds);
+                //设置分页对象
+                page = PageUtil.executePage(request, totalCount);
+                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
+                    everyIds.add(allIds.get((int) i));
+                    sortedEveryIds.add(sortedIds.get((int) i));
+                }
+                System.out.println(allIds.size() + everyIds.toString());
+                forwards = questionSearchService.selectQByPage(everyIds);
+                sortedForwards = questionSearchService.selectQByPage(sortedEveryIds);
+            }
+
+        } else if (type.equals("people")) {
+            allIds = genIds(type, questionStr, quality, questionSearchService.getrPeoplesMap());
+
+            if (allIds.size() > 0) {
+                totalCount = questionSearchService.getPPageCounts(allIds);
+                //设置分页对象
+                page = PageUtil.executePage(request, totalCount);
+                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
+                    everyIds.add(allIds.get((int) i));
+                }
+                forwards = questionSearchService.selectPByPage(everyIds);
+            }
+
+        } else {
+            allIds = genIds(type, questionStr, quality, questionSearchService.getrTopicsMap());
+            if (allIds.size() > 0) {
+                totalCount = questionSearchService.getTPageCounts(allIds);
+                //设置分页对象
+                page = PageUtil.executePage(request, totalCount);
+                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
+                    everyIds.add(allIds.get((int) i));
+                }
+                forwards = questionSearchService.selectTByPage(everyIds);
+            }
+        }
+        mav = new ModelAndView("frame");
+        mav.addObject("idCount", allIds.size());
+        mav.addObject("type", type);
+        mav.addObject("q", questionStr);
+        if (allIds.size() > 0) {
+            mav.addObject("forwards", forwards);
+            if (type.equals("question")) {
+                mav.addObject("sortedForwards", sortedForwards);
+            }
+        }
+        return mav;
+    }
+
+    /**
+     * setCookie 0
+     *
+     *
+     * @return
+     * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
+     */
+//    @RequestMapping("/search")
+
+
+
+    private List<Integer> genIds(String type, String str, List<QualitySort> quality, Map<String, Reverse> rMap) {
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(HanLP.segment(str));
         for (int i = 0; i < terms.size(); i++) {
@@ -190,22 +217,29 @@ public class QuestionController  {
         }
         List<Integer> ids = new ArrayList<Integer>();
         List<Reverse> keyWords = new ArrayList<Reverse>();
-        //此处有区别，使用type区分
-        if (type.equals("question")) {
-            for (Term term : terms) {
-                if (rQuestionsMap.containsKey(term.word)) {
-                    keyWords.add(rQuestionsMap.get(term.word));
-                }
-            }
-        } else {
-            for (Term term : terms) {
-                for (Map.Entry<String, Reverse> entry : rQuestionsMap.entrySet()) {
-                    if (entry.getKey().contains(term.word)) {
-                        keyWords.add(entry.getValue());
-                    }
-                }
+
+        for (Term term : terms) {
+            if (rMap.containsKey(term.word)) {
+                keyWords.add(rMap.get(term.word));
             }
         }
+
+        //此处有区别，使用type区分(对people和topic进行分词，全部统一)@Deprecated
+//        if (type.equals("question")) {
+//            for (Term term : terms) {
+//                if (rQuestionsMap.containsKey(term.word)) {
+//                    keyWords.add(rQuestionsMap.get(term.word));
+//                }
+//            }
+//        } else {
+//            for (Term term : terms) {
+//                for (Map.Entry<String, Reverse> entry : rQuestionsMap.entrySet()) {
+//                    if (entry.getKey().contains(term.word)) {
+//                        keyWords.add(entry.getValue());
+//                    }
+//                }
+//            }
+//        }
 
         Collections.sort(keyWords);//按IDF大小排序
 
@@ -217,11 +251,12 @@ public class QuestionController  {
 
         //得到最终排序
         Set<String> urls = new LinkedHashSet<String>();//保证按顺序且不重复
+//        Set<QualitySort> quality = new TreeSet<QualitySort>();
         List<String> temp = new ArrayList<String>();
         int len = sortedUrls.size() + 1;
         if (type.equals("question")) {
             for (int i = len - 1; i != 0; i--) {
-                genQInSequence(urls, sortedUrls, 0, i, temp);
+                genQInSequence(urls, quality, sortedUrls, 0, i, temp);
             }
         } else {
             for (int i = len - 1; i != 0; i--) {
@@ -314,7 +349,7 @@ public class QuestionController  {
     }
 
     //问题递归获取全组合，并返回求交集后的结果
-    private void genQInSequence(Set<String> urls, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
+    private void genQInSequence(Set<String> urls, List<QualitySort> quality, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
         if (len == 0) {
             List<TF_IDF> result = new ArrayList<TF_IDF>();
             for (int i = 0; i < Arrays.asList(temp.get(0).split(Config.DELIMITER)).size(); i++) {
@@ -333,6 +368,7 @@ public class QuestionController  {
             System.out.println(result.toString());
             for (int i = 0; i < result.size(); i++) {
                 urls.add(result.get(i).getUrl());
+                quality.add(new QualitySort(result.get(i).getUrl(), result.get(i).getQuality()));
             }
 //            urls.addAll(result);
             return;
@@ -341,24 +377,30 @@ public class QuestionController  {
             return;
         }
         temp.add(sortedUrls.get(start));
-        genQInSequence(urls, sortedUrls, start + 1, len - 1, temp);
+        genQInSequence(urls, quality, sortedUrls, start + 1, len - 1, temp);
         temp.remove(temp.size() - 1);
-        genQInSequence(urls, sortedUrls, start + 1, len, temp);
+        genQInSequence(urls, quality, sortedUrls, start + 1, len, temp);
     }
 
-    class TF_IDF implements Comparable<TF_IDF>{
+    class TF_IDF implements Comparable<TF_IDF> {
         private double TF;
         private double IDF;
         private String url;
+        private int quality;
 
         public String getUrl() {
             return url;
         }
 
+        public int getQuality() {
+            return quality;
+        }
+
         TF_IDF(String str) {
             this.url = str.split(",")[0];
-            this.TF = Double.parseDouble(str.split(",")[2]);
-            this.IDF = Double.parseDouble(str.split(",")[3]);
+            this.TF = Double.parseDouble(str.split(",")[1]);
+            this.IDF = Double.parseDouble(str.split(",")[2]);
+            this.quality = Integer.valueOf(str.split(",")[3]);
         }
 
         @Override
@@ -376,12 +418,74 @@ public class QuestionController  {
             return url.hashCode();
         }
 
+        public boolean equal(double a, double b) {
+            if ((a - b > -0.000001) && (a - b) < 0.000001)
+                return true;
+            else
+                return false;
+        }
+
         //升序！！！
         @Override
         public int compareTo(TF_IDF object) {
-            String str1 = String.valueOf(TF * IDF);
-            String str2 = String.valueOf(object.TF * object.IDF);
-            return -str1.compareTo(str2);
+            double str1 = TF * IDF;
+            double str2 = object.TF * object.IDF;
+            if (equal(str1, str2)) {
+                if (quality < object.quality) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            } else {
+                if (str1 < str2) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        }
+    }
+
+    class QualitySort implements Comparable<QualitySort> {
+        private String url;
+        private int quality;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public int getQuality() {
+            return quality;
+        }
+
+        QualitySort(String url, int quality) {
+            this.url = url;
+            this.quality = quality;
+        }
+
+        @Override
+        public String toString() {
+            return url.toString();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return url.equals(((QualitySort) obj).getUrl());
+        }
+
+        @Override
+        public int hashCode() {
+            return url.hashCode();
+        }
+
+        //升序！！！
+        @Override
+        public int compareTo(QualitySort object) {
+            if (quality < object.quality) {
+                return 1;
+            } else {
+                return -1;
+            }
         }
     }
 }

@@ -15,12 +15,13 @@ public class Filter {
             Term term = termList.get(i);
             String nature = term.nature != null ? term.nature.toString() : "空";
             char firstChar = nature.charAt(0);
-            switch(firstChar) {
+            switch (firstChar) {
+                case '1': //自定义
+                    break;
                 case 'b': //区别词 正 副
                 case 'z': //状态词
                 case 'r': //代词 怎样 如何
                 case 'm':
-                    break;
                 case 'c':
                 case 'e':
                 case 'o':
@@ -45,7 +46,7 @@ public class Filter {
                 case 'v':
                 case 'x':
                 default:
-                    if(term.word.length() == 1) {//长度为1，删除，可以理解为没有分出来词，因此删除，最后查询时分出的词，也可以删除停用词
+                    if (term.word.length() == 1) {//长度为1，删除，可以理解为没有分出来词，因此删除，最后查询时分出的词，也可以删除停用词
                         temp.add(term);
                     }
             }

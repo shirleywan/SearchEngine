@@ -212,7 +212,7 @@ public class Page implements Serializable {//序列化用以保存到session中
      */
     private Long getTotalPage(Long totalRecords) {
         Long totalPage = 0L;
-        everyPage = everyPage == null ? 1L : everyPage;
+        everyPage = everyPage == null ? 10L : everyPage;
         if (totalRecords % everyPage == 0)
             totalPage = totalRecords / everyPage;
         else {
@@ -244,7 +244,7 @@ public class Page implements Serializable {//序列化用以保存到session中
     }
 
     public Long getEveryPage() {
-        this.everyPage = everyPage == 0 ? 10 : everyPage;
+        this.everyPage = everyPage == 0 ? 10L : everyPage;
         return this.everyPage;
     }
 

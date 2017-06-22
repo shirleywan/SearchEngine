@@ -8,9 +8,9 @@
     </typeAliases>
 
     <!--不使用插件时需要注释-->
-    <plugins>
-        <plugin interceptor="com.szl.page.PageInterceptor">
-            <property name="databaseType" value="mysql"/>
-        </plugin>
-    </plugins>
+    <!--<plugins>-->
+        <!--<plugin interceptor="com.szl.page.PageInterceptor">-->
+            <!--<property name="databaseType" value="mysql"/>-->
+        <!--</plugin>-->
+    <!--</plugins>-->
 </configuration>

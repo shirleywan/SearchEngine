@@ -11,28 +11,32 @@ public class Forward implements Serializable,Comparable<Forward>{
     private String title;//标题
     private String url;//网页地址
     private String description;//摘要
+    private String qDescription;//摘要
     private int quality;//权重
     private String keyWords;//关键词
     private String TF;
 
+    private String pro;
+    private String user;
+
     public Forward() {}
 
-    public Forward(String title, String url, String description, int quality, String keyWords) {
-        this.title = title;
-        this.url = url;
-        this.description = description;
-        this.quality = quality;
-        this.keyWords = keyWords;
-    }
-
-    public Forward(String title, String url, String description, int quality, String keyWords, String TF) {
-        this.title = title;
-        this.url = url;
-        this.description = description;
-        this.quality = quality;
-        this.keyWords = keyWords;
-        this.TF = TF;
-    }
+//    public Forward(String title, String url, String description, int quality, String keyWords) {
+//        this.title = title;
+//        this.url = url;
+//        this.description = description;
+//        this.quality = quality;
+//        this.keyWords = keyWords;
+//    }
+//
+//    public Forward(String title, String url, String description, int quality, String keyWords, String TF) {
+//        this.title = title;
+//        this.url = url;
+//        this.description = description;
+//        this.quality = quality;
+//        this.keyWords = keyWords;
+//        this.TF = TF;
+//    }
 
     @Override
     public int compareTo(Forward forward) {
@@ -57,6 +61,14 @@ public class Forward implements Serializable,Comparable<Forward>{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getqDescription() {
+        return description.split("\\r\\n")[2];
+    }
+
+    public void setqDescription(String qDescription) {
+        this.qDescription = qDescription;
     }
 
     public String getKeyWords() {
@@ -97,5 +109,21 @@ public class Forward implements Serializable,Comparable<Forward>{
 
     public void setTF(String TF) {
         this.TF = TF;
+    }
+
+    public String getPro() {
+        return description.split("\\r\\n")[0];
+    }
+
+    public void setPro(String pro) {
+        this.pro = pro;
+    }
+
+    public String getUser() {
+        return description.split("\\r\\n")[1].equals("") ? "匿名用户" : description.split("\\r\\n")[1];
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }
