@@ -29,7 +29,7 @@
                     <div class="col-lg-5" style="margin-top:6px;">
                         <div class="input-group">
                             <input type="hidden" name="type" value="question">
-                            <input class="form-control" type="text" name="q" placeholder="搜索你感兴趣的内容...">
+                            <input class="form-control" type="text" name="q" value=${q}>
                             <%--<span class="input-group-btn"><button class="btn btn-default" type="submit">Go!</button></span>--%>
                     <span class="input-group-btn">
                         <button class="btn btn-default" style="height:34px;" type="submit">

@@ -10,17 +10,22 @@
 <html>
 <head>
     <title>Search</title>
+    <link href="<c:url value='/static/css/bootstrap.min.css'/>" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="<c:url value='/static/js/jquery-3.2.1.min.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/static/js/bootstrap.min.js'/>"></script>
 </head>
 <body>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 <form action="search" method="get">
-    <p>
-        <input type="hidden" name="type" value="question">
-        <input type="text" name="q">
-    </p>
+    <div class="col-lg-6 col-md-offset-3">
+        <div class="input-group input-group-lg">
+            <input type="hidden" name="type" value="question">
+            <input class="form-control" type="text" name="q" placeholder="搜索你感兴趣的内容...">
+            <span class="input-group-btn"><button class="btn btn-primary" type="submit">Gooooo!</button></span>
 
-    <p>
-        <button type="submit">提交</button>
-    </p>
+            <%--<span class="input-group-addon btn btn-primary">Gooooo!</span>--%>
+        </div>
+    </div>
 </form>
 
 </body>
