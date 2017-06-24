@@ -73,7 +73,7 @@ public class QuestionSearchService implements SearchService {
         for (Forward question : fQuestions) {
             fQuestionsMap.put(String.valueOf(question.getId()), question);
         }
-        System.out.println(rQuestionsMap.size() + "     " + fQuestionsMap.size());
+        System.out.println("问题倒排列表 " + rQuestionsMap.size() + "     " + "问题正排列表 " +  fQuestionsMap.size());
 
         for (Reverse people : rPeoples) {
             rPeoplesMap.put(people.getKeyWords(), people);
@@ -82,7 +82,7 @@ public class QuestionSearchService implements SearchService {
         for (Forward people : fPeoples) {
             fPeoplesMap.put(String.valueOf(people.getId()), people);
         }
-        System.out.println(rPeoplesMap.size() + "     " + fPeoplesMap.size());
+        System.out.println("用户倒排列表 " + rPeoplesMap.size() + "     " + "用户正排列表 " + fPeoplesMap.size());
 
         for (Reverse people : rTopics) {
             rTopicsMap.put(people.getKeyWords(), people);
@@ -91,7 +91,7 @@ public class QuestionSearchService implements SearchService {
         for (Forward people : fTopics) {
             fTopicsMap.put(String.valueOf(people.getId()), people);
         }
-        System.out.println(rTopicsMap.size() + "     " + fTopicsMap.size());
+        System.out.println("话题倒排列表 " + rTopicsMap.size() + "     " + "话题正排列表 " + fTopicsMap.size());
 
     }
 

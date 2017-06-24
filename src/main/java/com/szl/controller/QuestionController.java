@@ -9,14 +9,19 @@ import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
 import com.szl.page.PageUtil;
 import com.szl.service.QuestionSearchService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -127,11 +132,12 @@ public class QuestionController {
      * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
      */
     @RequestMapping("/search")
-    public ModelAndView getQuestions(HttpServletRequest request, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
-        ModelAndView mav = null;
+    public ModelAndView getQuestions(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
+        ModelAndView mav = new ModelAndView("frame");
         List<Forward> forwards = null;
         List<Forward> sortedForwards = null;
         List<QualitySort> quality = null;
+        Set<QualitySort> qualitySet = null;
         List<Integer> allIds = null;
         List<Integer> sortedIds = null;
         List<Integer> everyIds = new ArrayList<Integer>();
@@ -140,9 +146,10 @@ public class QuestionController {
         Page page = null;
 
         if (type.equals("question")) {
-            quality = new ArrayList<QualitySort>();
+            qualitySet = new HashSet<QualitySort>();
             sortedIds = new ArrayList<Integer>();
-            allIds = genIds(type, questionStr, quality, questionSearchService.getrQuestionsMap());
+            allIds = genIds(type, questionStr, qualitySet, questionSearchService.getrQuestionsMap());
+            quality = new ArrayList<QualitySort>(qualitySet);
             Collections.sort(quality);
             for (QualitySort url : quality) {
                 sortedIds.add(Integer.parseInt(url.getUrl()));
@@ -155,13 +162,35 @@ public class QuestionController {
                     everyIds.add(allIds.get((int) i));
                     sortedEveryIds.add(sortedIds.get((int) i));
                 }
-                System.out.println(allIds.size() + everyIds.toString());
-                forwards = questionSearchService.selectQByPage(everyIds);
-                sortedForwards = questionSearchService.selectQByPage(sortedEveryIds);
+//                System.out.println(allIds.size() + everyIds.toString());
+                Cookie cookie = getCookie(request, "zscNav");
+                //首次获取cookie
+                if (cookie == null) {
+                    cookie = new Cookie("zscNav", "0");
+                    cookie.setMaxAge(60);
+                    response.addCookie(cookie);
+                }
+                //重新查询重置cookie
+                if (StringUtils.isEmpty(request.getParameter("redirect")) && StringUtils.isEmpty(request.getParameter("pageAction"))) {
+                    cookie.setValue("0");
+                    cookie.setMaxAge(60);
+                    response.addCookie(cookie);
+                }
+                //判断标签页，第一次cookie为null
+                if (cookie == null || cookie.getValue().equals("0")) {
+                    forwards = questionSearchService.selectQByPage(everyIds);
+                    System.out.println("sss3 " + forwards.size());
+                    mav.addObject("forwards", forwards);
+                    mav.addObject("nav", "0");
+                } else {
+                    sortedForwards = questionSearchService.selectQByPage(sortedEveryIds);
+                    mav.addObject("sortedForwards", sortedForwards);
+                    mav.addObject("nav", "1");
+                }
             }
 
         } else if (type.equals("people")) {
-            allIds = genIds(type, questionStr, quality, questionSearchService.getrPeoplesMap());
+            allIds = genIds(type, questionStr, qualitySet, questionSearchService.getrPeoplesMap());
 
             if (allIds.size() > 0) {
                 totalCount = questionSearchService.getPPageCounts(allIds);
@@ -171,10 +200,11 @@ public class QuestionController {
                     everyIds.add(allIds.get((int) i));
                 }
                 forwards = questionSearchService.selectPByPage(everyIds);
+                mav.addObject("forwards", forwards);
             }
 
         } else {
-            allIds = genIds(type, questionStr, quality, questionSearchService.getrTopicsMap());
+            allIds = genIds(type, questionStr, qualitySet, questionSearchService.getrTopicsMap());
             if (allIds.size() > 0) {
                 totalCount = questionSearchService.getTPageCounts(allIds);
                 //设置分页对象
@@ -183,38 +213,121 @@ public class QuestionController {
                     everyIds.add(allIds.get((int) i));
                 }
                 forwards = questionSearchService.selectTByPage(everyIds);
+                mav.addObject("forwards", forwards);
             }
         }
-        mav = new ModelAndView("frame");
         mav.addObject("idCount", allIds.size());
         mav.addObject("type", type);
         mav.addObject("q", questionStr);
-        if (allIds.size() > 0) {
-            mav.addObject("forwards", forwards);
-            if (type.equals("question")) {
-                mav.addObject("sortedForwards", sortedForwards);
-            }
-        }
         return mav;
     }
 
     /**
      * setCookie 0
      *
-     *
      * @return
      * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
      */
-//    @RequestMapping("/search")
+    @RequestMapping("/nav0")
+    public String nav0(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attributes,@RequestParam(value = "q") String questionStr) {
 
 
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies == null) {
+//            System.out.println("没有cookie==============");
+//        } else {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals("zscNav")) {
+//                    System.out.println("原值为:" + cookie.getValue());
+//                    cookie.setValue("0");
+////                    cookie.setPath("/");
+//                    cookie.setMaxAge(60 * 60);// 设置为60min
+//                    response.addCookie(cookie);
+//                    break;
+//                }
+//            }
+//        }
+        if (getCookie(request, "zscNav") == null) {
+            Cookie cookie = new Cookie("zscNav", "0");
+            cookie.setMaxAge(60);// 设置为60min
+            response.addCookie(cookie);
+        } else {
+            Cookie cookie = getCookie(request, "zscNav");
+            cookie.setValue("0");
+            cookie.setMaxAge(60);// 设置为60min
+            response.addCookie(cookie);
+        }
 
-    private List<Integer> genIds(String type, String str, List<QualitySort> quality, Map<String, Reverse> rMap) {
+
+        attributes.addAttribute("type", "question");
+        attributes.addAttribute("q", questionStr);
+        attributes.addAttribute("redirect", "0");
+
+        return "redirect:/search";
+    }
+
+    @RequestMapping("/nav1")
+    public String nav1(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attributes,@RequestParam(value = "q") String questionStr) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies == null) {
+//            System.out.println("没有cookie==============");
+//        } else {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals("zscNav")) {
+//                    System.out.println("原值为:" + cookie.getValue());
+//                    cookie.setValue("1");
+////                    cookie.setPath("/");
+//                    cookie.setMaxAge(60);// 设置为60min
+//                    response.addCookie(cookie);
+//                    break;
+//                }
+//            }
+//        }
+        if (getCookie(request, "zscNav") == null) {
+            Cookie cookie = new Cookie("zscNav", "1");
+            cookie.setMaxAge(60);
+            response.addCookie(cookie);
+        } else {
+            Cookie cookie = getCookie(request, "zscNav");
+            cookie.setValue("1");
+            cookie.setMaxAge(60);
+            response.addCookie(cookie);
+        }
+        attributes.addAttribute("type", "question");
+        attributes.addAttribute("q", questionStr);
+        attributes.addAttribute("redirect", "1");
+        return "redirect:/search";
+    }
+
+
+    /**
+     * 根据Cookie名获取对应的Cookie
+     *
+     * @param request HttpServletRequest
+     * @param cookieName cookie名称
+     *
+     * @return 对应cookie，如果不存在则返回null
+     */
+    public static Cookie getCookie(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null || cookieName == null || cookieName.equals(""))
+            return null;
+
+        for (Cookie c : cookies) {
+            if (c.getName().equals(cookieName)){
+                return c;
+            }
+        }
+        return null;
+    }
+
+
+    private List<Integer> genIds(String type, String str, Set<QualitySort> qualitySet, Map<String, Reverse> rMap) {
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(HanLP.segment(str));
-        for (int i = 0; i < terms.size(); i++) {
-            System.out.println("分词结果 " + terms.get(i).word);
-        }
+        System.out.println("分词结果 " + terms.toString());
+
         List<Integer> ids = new ArrayList<Integer>();
         List<Reverse> keyWords = new ArrayList<Reverse>();
 
@@ -256,7 +369,7 @@ public class QuestionController {
         int len = sortedUrls.size() + 1;
         if (type.equals("question")) {
             for (int i = len - 1; i != 0; i--) {
-                genQInSequence(urls, quality, sortedUrls, 0, i, temp);
+                genQInSequence(urls, qualitySet, sortedUrls, 0, i, temp);
             }
         } else {
             for (int i = len - 1; i != 0; i--) {
@@ -265,7 +378,7 @@ public class QuestionController {
         }
 
         //显示结果
-        System.out.println("最终url: " + urls);
+//        System.out.println("最终url: " + urls);
         for (String url : urls) {
             ids.add(Integer.parseInt(url));
         }
@@ -316,15 +429,15 @@ public class QuestionController {
         }
 
         //显示结果
-        System.out.println("最终url: " + urls);
+//        System.out.println("最终url: " + urls);
         for (String num : urls) {
             if (fQuestionsMap.containsKey(num)) {
                 forwards.add(fQuestionsMap.get(num));
             }
         }
-        for (int i = 0; i < forwards.size(); i++) {
-            System.out.println("最终结果  " + forwards.get(i).getId());
-        }
+//        for (int i = 0; i < forwards.size(); i++) {
+//            System.out.println("最终结果  " + forwards.get(i).getId());
+//        }
         return forwards;
     }
 
@@ -349,7 +462,7 @@ public class QuestionController {
     }
 
     //问题递归获取全组合，并返回求交集后的结果
-    private void genQInSequence(Set<String> urls, List<QualitySort> quality, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
+    private void genQInSequence(Set<String> urls, Set<QualitySort> qualitySet, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
         if (len == 0) {
             List<TF_IDF> result = new ArrayList<TF_IDF>();
             for (int i = 0; i < Arrays.asList(temp.get(0).split(Config.DELIMITER)).size(); i++) {
@@ -365,10 +478,10 @@ public class QuestionController {
                 result.retainAll(result2);
             }
             Collections.sort(result);
-            System.out.println(result.toString());
+//            System.out.println(result.toString());
             for (int i = 0; i < result.size(); i++) {
                 urls.add(result.get(i).getUrl());
-                quality.add(new QualitySort(result.get(i).getUrl(), result.get(i).getQuality()));
+                qualitySet.add(new QualitySort(result.get(i).getUrl(), result.get(i).getQuality()));
             }
 //            urls.addAll(result);
             return;
@@ -377,9 +490,9 @@ public class QuestionController {
             return;
         }
         temp.add(sortedUrls.get(start));
-        genQInSequence(urls, quality, sortedUrls, start + 1, len - 1, temp);
+        genQInSequence(urls, qualitySet, sortedUrls, start + 1, len - 1, temp);
         temp.remove(temp.size() - 1);
-        genQInSequence(urls, quality, sortedUrls, start + 1, len, temp);
+        genQInSequence(urls, qualitySet, sortedUrls, start + 1, len, temp);
     }
 
     class TF_IDF implements Comparable<TF_IDF> {

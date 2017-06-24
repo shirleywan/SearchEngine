@@ -10,15 +10,16 @@
 
 <c:choose>
     <c:when test="${type == 'question'}">
-        <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade in active" id="home">
+        <c:choose>
+            <c:when test="${nav == '0'}">
                 <c:forEach items="${forwards}" var="forward">
                     <div class="row">
                         <div class="col-md-8">
                             <a href="${forward.url}"> ${forward.title}</a>
                         </div>
                         <div class="col-md-2">
-                            <h5><span class="glyphicon glyphicon-user" aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
+                            <h5><span class="glyphicon glyphicon-user"
+                                      aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
                             </h5>
                         </div>
                     </div>
@@ -42,15 +43,16 @@
                         </div>
                     </div>
                 </c:forEach>
-            </div>
-            <div class="tab-pane fade" id="quality">
+            </c:when>
+            <c:otherwise>
                 <c:forEach items="${sortedForwards}" var="forward">
                     <div class="row">
                         <div class="col-md-8">
                             <a href="${forward.url}"> ${forward.title}</a>
                         </div>
                         <div class="col-md-2">
-                            <h5><span class="glyphicon glyphicon-user" aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
+                            <h5><span class="glyphicon glyphicon-user"
+                                      aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
                             </h5>
                         </div>
                     </div>
@@ -64,7 +66,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-8 col-md-offset-1">
+                        <div class="col-md-7 col-md-offset-1">
                             <h5>${forward.qDescription}</h5>
                         </div>
                     </div>
@@ -74,17 +76,20 @@
                         </div>
                     </div>
                 </c:forEach>
-            </div>
-        </div>
+            </c:otherwise>
+        </c:choose>
     </c:when>
+
     <c:when test="${type == 'people'}">
         <c:forEach items="${forwards}" var="forward">
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-8">
                     <a href="${forward.url}"> ${forward.title}</a>
                 </div>
-                <div class="col-md-offset-6 col-md-2">
-                    <h5><strong>${forward.quality}</strong>&thinsp;关注者</h5>
+                <div class="col-md-2">
+                    <h5><span class="glyphicon glyphicon-user"
+                              aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
+                    </h5>
                 </div>
             </div>
 
@@ -101,6 +106,7 @@
             </div>
         </c:forEach>
     </c:when>
+
     <c:when test="${type == 'topic'}">
         <c:forEach items="${forwards}" var="forward">
             <div class="row">

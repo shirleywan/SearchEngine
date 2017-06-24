@@ -15,15 +15,23 @@
     <script type="text/javascript" src="<c:url value='/static/js/bootstrap.min.js'/>"></script>
 </head>
 <body>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<div class="row">
+    <div class="col-lg-12">
+        <img class="center-block" src="<c:url value='/static/img/search2.png'/>" alt="知乎"/>
+    </div>
+</div>
+<br>
 <form action="search" method="get">
-    <div class="col-lg-6 col-md-offset-3">
-        <div class="input-group input-group-lg">
-            <input type="hidden" name="type" value="question">
-            <input class="form-control" type="text" name="q" placeholder="搜索你感兴趣的内容...">
-            <span class="input-group-btn"><button class="btn btn-primary" type="submit">Gooooo!</button></span>
+    <div class="row">
+        <div class="col-lg-6 col-md-offset-3">
+            <div class="input-group input-group-lg">
+                <input type="hidden" name="type" value="question">
+                <input class="form-control" type="text" name="q" placeholder="搜索你感兴趣的内容...">
+                <span class="input-group-btn"><button class="btn btn-primary" type="submit">Go</button></span>
 
-            <%--<span class="input-group-addon btn btn-primary">Gooooo!</span>--%>
+                <%--<span class="input-group-addon btn btn-primary">Gooooo!</span>--%>
+            </div>
         </div>
     </div>
 </form>

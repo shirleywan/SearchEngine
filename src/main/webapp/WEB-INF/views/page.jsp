@@ -17,6 +17,7 @@
     <div class="col-md-10">
         <nav aria-label="Page navigation">
             <ul class="pagination">
+                <%--双引号内${}两边不能有空格--%>
                 <c:choose>
                     <c:when test="${page.totalPage == 1}">
                         <li class="disabled"><a href="#" aria-label="Previous"><span
@@ -46,7 +47,7 @@
 
                         <%--首页--%>
                         <c:choose>
-                            <c:when test="${page.currentPage >= 6}">
+                            <c:when test="${(page.currentPage >= 6) && (page.totalPage >= 9)}">
                                 <li><a href="${pathurl}&pageAction=gopage&pageKey=1${urlParams}">1...</a></li>
                             </c:when>
                             <c:otherwise>
@@ -83,7 +84,7 @@
 
                         <%--尾页--%>
                         <c:choose>
-                            <c:when test="${page.currentPage <= (page.totalPage - 5)}">
+                            <c:when test="${(page.currentPage <= (page.totalPage - 5)) && (page.totalPage >= 9)}">
                                 <li>
                                     <a href="${pathurl}&pageAction=gopage&pageKey=${page.totalPage}${urlParams}">...${page.totalPage}</a>
                                 </li>

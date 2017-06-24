@@ -18,18 +18,12 @@
                     </a>
                 </div>
 
-                <%--<form class="navbar-form navbar-left">--%>
-                <%--<div class="form-group">--%>
-                <%--<input type="text" class="form-control" placeholder="Search">--%>
-                <%--</div>--%>
-                <%--<button type="submit" class="btn btn-default">Submit</button>--%>
-                <%--</form>--%>
-
+                <%--value="${q}"一定加引号，否则识别不出空格--%>
                 <form action="search" method="get">
                     <div class="col-lg-5" style="margin-top:6px;">
                         <div class="input-group">
                             <input type="hidden" name="type" value="question">
-                            <input class="form-control" type="text" name="q" value=${q}>
+                            <input class="form-control" type="text" name="q" value="${q}">
                             <%--<span class="input-group-btn"><button class="btn btn-default" type="submit">Go!</button></span>--%>
                     <span class="input-group-btn">
                         <button class="btn btn-default" style="height:34px;" type="submit">

@@ -13,18 +13,32 @@
             <c:choose>
                 <c:when test="${nav == '0'}">
                     <li role="presentation" class="active">
-                        <a href="<%=request.getContextPath()%>/nav0">按相关度排序</a>
+                        <form action="nav0" method="get">
+                            <input type="hidden" name="q" value="${q}">
+                            <button class="btn btn-primary" type="submit">按相关度排序</button>
+                        </form>
                     </li>
                     <li role="presentation">
-                        <a href="<%=request.getContextPath()%>/nav1">按关注度排序</a>
+                        <form action="nav1" method="get">
+                            <input type="hidden" name="q" value="${q}">
+                            <button class="btn btn-default" type="submit">按关注度排序</button>
+                        </form>
                     </li>
+
                 </c:when>
                 <c:otherwise>
                     <li role="presentation">
-                        <a href="<%=request.getContextPath()%>/nav0">按相关度排序</a>
+                        <form action="nav0" method="get">
+                            <input type="hidden" name="q" value="${q}">
+                            <button class="btn btn-default" type="submit">按相关度排序</button>
+
+                        </form>
                     </li>
                     <li role="presentation" class="active">
-                        <a href="<%=request.getContextPath()%>/nav1">按关注度排序</a>
+                        <form action="nav1" method="get">
+                            <input type="hidden" name="q" value="${q}">
+                            <button class="btn btn-primary" type="submit">按关注度排序</button>
+                        </form>
                     </li>
                 </c:otherwise>
             </c:choose>

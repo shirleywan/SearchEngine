@@ -309,13 +309,14 @@ public class Page implements Serializable {//序列化用以保存到session中
     }
 
     public Long getSubBeginIndex() {
+        //8页内，全部显示，page.jsp也做处理
         if (totalPage < 9) {
             subBeginIndex = 2L;
         } else {
             if (currentPage < 6) {
                 subBeginIndex = 2L;
             } else if (currentPage > (totalPage - 5)) {
-                subBeginIndex = totalPage - 7;
+                subBeginIndex = totalPage - 7;//最后强行8页
             } else {
                 subBeginIndex = currentPage - 3;
             }
