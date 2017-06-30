@@ -1,5 +1,6 @@
 package com.szl.service;
 
+import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.tokenizer.StandardTokenizer;
 import com.szl.Filter;
@@ -59,47 +60,52 @@ public class QuestionSearchService implements SearchService {
     @PostConstruct
     public void init() {
         System.out.println("@PostConstruct方法被调用");
-        fQuestions = getFQuestions();
-        rQuestions = getRQuestions();//将数据库的问题正排和倒排读进来
-        fPeoples = getFPeoples();
-        rPeoples = getRPeoples();
-        fTopics = getFTopics();
-        rTopics = getRTopics();
+//        fQuestions = getFQuestions();
+//        rQuestions = getRQuestions();//将数据库的问题正排和倒排读进来
+//        fPeoples = getFPeoples();
+//        rPeoples = getRPeoples();
+//        fTopics = getFTopics();
+//        rTopics = getRTopics();
         //将2个表读到Map里
-        for (Reverse question : rQuestions) {
-            rQuestionsMap.put(question.getKeyWords(), question);
-        }
-
-        for (Forward question : fQuestions) {
-            fQuestionsMap.put(String.valueOf(question.getId()), question);
-        }
-        System.out.println("问题倒排列表 " + rQuestionsMap.size() + "     " + "问题正排列表 " +  fQuestionsMap.size());
-
-        for (Reverse people : rPeoples) {
-            rPeoplesMap.put(people.getKeyWords(), people);
-        }
-
-        for (Forward people : fPeoples) {
-            fPeoplesMap.put(String.valueOf(people.getId()), people);
-        }
-        System.out.println("用户倒排列表 " + rPeoplesMap.size() + "     " + "用户正排列表 " + fPeoplesMap.size());
-
-        for (Reverse people : rTopics) {
-            rTopicsMap.put(people.getKeyWords(), people);
-        }
-
-        for (Forward people : fTopics) {
-            fTopicsMap.put(String.valueOf(people.getId()), people);
-        }
-        System.out.println("话题倒排列表 " + rTopicsMap.size() + "     " + "话题正排列表 " + fTopicsMap.size());
+//        for (Reverse question : rQuestions) {
+//            rQuestionsMap.put(question.getKeyWords(), question);
+//        }
+//
+//        for (Forward question : fQuestions) {
+//            fQuestionsMap.put(String.valueOf(question.getId()), question);
+//        }
+//        System.out.println("问题倒排列表 " + rQuestionsMap.size() + "     " + "问题正排列表 " +  fQuestionsMap.size());
+//
+//        for (Reverse people : rPeoples) {
+//            rPeoplesMap.put(people.getKeyWords(), people);
+//        }
+//
+//        for (Forward people : fPeoples) {
+//            fPeoplesMap.put(String.valueOf(people.getId()), people);
+//        }
+//        System.out.println("用户倒排列表 " + rPeoplesMap.size() + "     " + "用户正排列表 " + fPeoplesMap.size());
+//
+//        for (Reverse people : rTopics) {
+//            rTopicsMap.put(people.getKeyWords(), people);
+//        }
+//
+//        for (Forward people : fTopics) {
+//            fTopicsMap.put(String.valueOf(people.getId()), people);
+//        }
+//        System.out.println("话题倒排列表 " + rTopicsMap.size() + "     " + "话题正排列表 " + fTopicsMap.size());
 
     }
 
     public void test() {
-        List<Term> terms = Filter.accept(StandardTokenizer.segment("阿里巴巴体验"));
-        for (int i = 0; i < terms.size(); i++) {
-            System.out.println("分词结果 " + terms.get(i).word);
-        }
+//        HanLP.Config.ShowTermNature = true;
+
+//        List<Term> terms = Filter.accept(StandardTokenizer.segment(""));
+        String str = "";
+        List<Term> terms = Filter.accept(StandardTokenizer.segment(str));
+//        List<Term> terms2 =StandardTokenizer.segment("");
+        List<Term> terms2 =StandardTokenizer.segment(str);
+        System.out.println(terms.toString());
+        System.out.println(terms2.toString());
     }
 
     public Map<String, Forward> getfQuestionsMap() {
@@ -172,6 +178,18 @@ public class QuestionSearchService implements SearchService {
 
     public List<Forward> selectTByPage(List<Integer> Ids) {
         return topicForwardDao.selectByPage(Ids);
+    }
+
+    public Reverse getQUrls(String keywords) {
+        return questionReverseDao.selectByKeyWords(keywords);
+    }
+
+    public Reverse getPUrls(String keywords) {
+        return peopleReverseDao.selectByKeyWords(keywords);
+    }
+
+    public Reverse getTUrls(String keywords) {
+        return topicReverseDao.selectByKeyWords(keywords);
     }
 
     //分页插件

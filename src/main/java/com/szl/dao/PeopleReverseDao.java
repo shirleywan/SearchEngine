@@ -10,6 +10,8 @@ import java.util.List;
 public interface PeopleReverseDao {
     Reverse selectById(int Id);
 
+    Reverse selectByKeyWords(String keywords);
+
     List<Reverse> selectAll();
 
     void insert(Reverse reverse);

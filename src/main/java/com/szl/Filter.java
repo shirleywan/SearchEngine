@@ -20,7 +20,7 @@ public class Filter {
                     break;
                 case 'b': //区别词 正 副
                 case 'z': //状态词
-                case 'r': //代词 怎样 如何
+
                 case 'm':
                 case 'c':
                 case 'e':
@@ -32,6 +32,7 @@ public class Filter {
                 case 'y':
                     temp.add(term);
                     break;
+                case 'r': //代词 怎样 如何
                 case 'd':
                 case 'f':
                 case 'g':

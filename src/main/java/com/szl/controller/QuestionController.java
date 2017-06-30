@@ -2,6 +2,7 @@ package com.szl.controller;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
+import com.hankcs.hanlp.tokenizer.StandardTokenizer;
 import com.szl.Config;
 import com.szl.Filter;
 import com.szl.page.Page;
@@ -148,7 +149,7 @@ public class QuestionController {
         if (type.equals("question")) {
             qualitySet = new HashSet<QualitySort>();
             sortedIds = new ArrayList<Integer>();
-            allIds = genIds(type, questionStr, qualitySet, questionSearchService.getrQuestionsMap());
+            allIds = genIds(type, questionStr, qualitySet);
             quality = new ArrayList<QualitySort>(qualitySet);
             Collections.sort(quality);
             for (QualitySort url : quality) {
@@ -179,7 +180,7 @@ public class QuestionController {
                 //判断标签页，第一次cookie为null
                 if (cookie == null || cookie.getValue().equals("0")) {
                     forwards = questionSearchService.selectQByPage(everyIds);
-                    System.out.println("sss3 " + forwards.size());
+//                    System.out.println("sss3 " + forwards.size());
                     mav.addObject("forwards", forwards);
                     mav.addObject("nav", "0");
                 } else {
@@ -190,7 +191,7 @@ public class QuestionController {
             }
 
         } else if (type.equals("people")) {
-            allIds = genIds(type, questionStr, qualitySet, questionSearchService.getrPeoplesMap());
+            allIds = genIds(type, questionStr, qualitySet);
 
             if (allIds.size() > 0) {
                 totalCount = questionSearchService.getPPageCounts(allIds);
@@ -204,7 +205,7 @@ public class QuestionController {
             }
 
         } else {
-            allIds = genIds(type, questionStr, qualitySet, questionSearchService.getrTopicsMap());
+            allIds = genIds(type, questionStr, qualitySet);
             if (allIds.size() > 0) {
                 totalCount = questionSearchService.getTPageCounts(allIds);
                 //设置分页对象
@@ -323,17 +324,27 @@ public class QuestionController {
     }
 
 
-    private List<Integer> genIds(String type, String str, Set<QualitySort> qualitySet, Map<String, Reverse> rMap) {
+    private List<Integer> genIds(String type, String str, Set<QualitySort> qualitySet) {
+        System.out.println(str);
         //得到按序排列的关键字集合
-        List<Term> terms = Filter.accept(HanLP.segment(str));
+        List<Term> terms = Filter.accept(StandardTokenizer.segment(str));
         System.out.println("分词结果 " + terms.toString());
 
         List<Integer> ids = new ArrayList<Integer>();
         List<Reverse> keyWords = new ArrayList<Reverse>();
-
+        Reverse key;
         for (Term term : terms) {
-            if (rMap.containsKey(term.word)) {
-                keyWords.add(rMap.get(term.word));
+            if (type.equals("question")) {
+                key = questionSearchService.getQUrls(term.word);
+            } else if (type.equals("people")) {
+                key = questionSearchService.getPUrls(term.word);
+            } else {
+                key = questionSearchService.getTUrls(term.word);
+            }
+
+
+            if (key != null) {
+                keyWords.add(key);
             }
         }
 

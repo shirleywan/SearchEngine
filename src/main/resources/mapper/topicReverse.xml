@@ -15,6 +15,10 @@
         select * from topicr where id = #{id}
     </select>
 
+    <select id="selectByKeyWords" resultType="Reverse" >
+        select * from topicr where keywords = #{keywords}
+    </select>
+
     <select id="selectAll" resultMap="ReverseMap" >
         select * from topicr
     </select>

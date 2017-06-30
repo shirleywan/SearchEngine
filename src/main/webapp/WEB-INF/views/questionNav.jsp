@@ -39,8 +39,10 @@
         <hr>
     </div>
 </div>
-<jsp:include page="sortNav.jsp"/>
 
+<c:if test="${idCount != 0}">
+    <jsp:include page="sortNav.jsp"/>
+</c:if>
 <%--<div class="row">--%>
 <%--<h1>Question List</h1>--%>
 <%--<table>--%>
