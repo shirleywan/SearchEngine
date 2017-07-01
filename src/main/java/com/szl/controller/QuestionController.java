@@ -12,7 +12,6 @@ import com.szl.page.PageUtil;
 import com.szl.service.QuestionSearchService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -137,8 +136,8 @@ public class QuestionController {
         ModelAndView mav = new ModelAndView("frame");
         List<Forward> forwards = null;
         List<Forward> sortedForwards = null;
-        List<QualitySort> quality = null;
-        Set<QualitySort> qualitySet = null;
+        List<String> quality = null;
+        Set<String> qualitySet = null;
         List<Integer> allIds = null;
         List<Integer> sortedIds = null;
         List<Integer> everyIds = new ArrayList<Integer>();
@@ -147,13 +146,18 @@ public class QuestionController {
         Page page = null;
 
         if (type.equals("question")) {
-            qualitySet = new HashSet<QualitySort>();
+            qualitySet = new HashSet<String>();
             sortedIds = new ArrayList<Integer>();
             allIds = genIds(type, questionStr, qualitySet);
-            quality = new ArrayList<QualitySort>(qualitySet);
-            Collections.sort(quality);
-            for (QualitySort url : quality) {
-                sortedIds.add(Integer.parseInt(url.getUrl()));
+            quality = new ArrayList<String>(qualitySet);
+            Collections.sort(quality, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return -o1.compareTo(o2);
+                }
+            });
+            for (String url : quality) {
+                sortedIds.add(Integer.parseInt(url.split(",")[1]));
             }
             if (allIds.size() > 0) {
                 totalCount = questionSearchService.getQPageCounts(allIds);
@@ -324,7 +328,7 @@ public class QuestionController {
     }
 
 
-    private List<Integer> genIds(String type, String str, Set<QualitySort> qualitySet) {
+    private List<Integer> genIds(String type, String str, Set<String> qualitySet) {
         System.out.println(str);
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(StandardTokenizer.segment(str));
@@ -369,18 +373,21 @@ public class QuestionController {
 
         //得到按序排列的url集合，只要string
         List<String> sortedUrls = new ArrayList<String>();
+        List<String> sortedQualityUrls = new ArrayList<String>();
         for (Reverse reverse : keyWords) {
-            sortedUrls.add(reverse.getUrls());
+            sortedUrls.add(reverse.getPageID());
+            sortedQualityUrls.add(reverse.getQualityAndPID());
         }
 
         //得到最终排序
         Set<String> urls = new LinkedHashSet<String>();//保证按顺序且不重复
 //        Set<QualitySort> quality = new TreeSet<QualitySort>();
         List<String> temp = new ArrayList<String>();
+        List<String> temp2 = new ArrayList<String>();
         int len = sortedUrls.size() + 1;
         if (type.equals("question")) {
             for (int i = len - 1; i != 0; i--) {
-                genQInSequence(urls, qualitySet, sortedUrls, 0, i, temp);
+                genQInSequence(urls, qualitySet, sortedUrls, sortedQualityUrls, 0, i, temp, temp2);
             }
         } else {
             for (int i = len - 1; i != 0; i--) {
@@ -428,7 +435,7 @@ public class QuestionController {
         //得到按序排列的url集合，只要string
         List<String> sortedUrls = new ArrayList<String>();
         for (Reverse reverse : keyWords) {
-            sortedUrls.add(reverse.getUrls());
+            sortedUrls.add(reverse.getPageID());
         }
 
         //得到最终排序
@@ -473,40 +480,33 @@ public class QuestionController {
     }
 
     //问题递归获取全组合，并返回求交集后的结果
-    private void genQInSequence(Set<String> urls, Set<QualitySort> qualitySet, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
+    private void genQInSequence(Set<String> urls, Set<String> qualitySet, List<String> sortedUrls, List<String> sortedQualityUrls, int start, int len, List<String> temp, List<String> temp2) {//len为组合的长度
         if (len == 0) {
-            List<TF_IDF> result = new ArrayList<TF_IDF>();
-            for (int i = 0; i < Arrays.asList(temp.get(0).split(Config.DELIMITER)).size(); i++) {
-                TF_IDF tf_idf = new TF_IDF(Arrays.asList(temp.get(0).split(Config.DELIMITER)).get(i));
-                result.add(tf_idf);
-            }
+            List<String> result = new ArrayList<String>();
+            List<String> result2 = new ArrayList<String>();
+            result.addAll(Arrays.asList(temp.get(0).split(Config.DELIMITER)));
+            result2.addAll(Arrays.asList(temp2.get(0).split(Config.DELIMITER)));
             for (int i = 1; i < temp.size(); i++) {
-                List<TF_IDF> result2 = new ArrayList<TF_IDF>();//后面的存到一个数组里，与result求交
-                for (int j = 0; j < Arrays.asList(temp.get(i).split(Config.DELIMITER)).size(); j++) {
-                    TF_IDF tf_idf = new TF_IDF(Arrays.asList(temp.get(i).split(Config.DELIMITER)).get(j));
-                    result2.add(tf_idf);
-                }
-                result.retainAll(result2);
+                result.retainAll(Arrays.asList(temp.get(i).split(Config.DELIMITER)));
+                result2.retainAll(Arrays.asList(temp2.get(i).split(Config.DELIMITER)));
             }
-            Collections.sort(result);
 //            System.out.println(result.toString());
-            for (int i = 0; i < result.size(); i++) {
-                urls.add(result.get(i).getUrl());
-                qualitySet.add(new QualitySort(result.get(i).getUrl(), result.get(i).getQuality()));
-            }
-//            urls.addAll(result);
+            urls.addAll(result);
+            qualitySet.addAll(result2);
             return;
         }
         if (start == sortedUrls.size()) {
             return;
         }
         temp.add(sortedUrls.get(start));
-        genQInSequence(urls, qualitySet, sortedUrls, start + 1, len - 1, temp);
+        temp2.add(sortedQualityUrls.get(start));
+        genQInSequence(urls, qualitySet, sortedUrls, sortedQualityUrls, start + 1, len - 1, temp, temp2);
         temp.remove(temp.size() - 1);
-        genQInSequence(urls, qualitySet, sortedUrls, start + 1, len, temp);
+        temp2.remove(temp2.size() - 1);
+        genQInSequence(urls, qualitySet, sortedUrls, sortedQualityUrls, start + 1, len, temp, temp2);
     }
 
-    class TF_IDF implements Comparable<TF_IDF> {
+    /*class TF_IDF implements Comparable<TF_IDF> {
         private double TF;
         private double IDF;
         private String url;
@@ -568,9 +568,9 @@ public class QuestionController {
                 }
             }
         }
-    }
+    }*/
 
-    class QualitySort implements Comparable<QualitySort> {
+    /*class QualitySort implements Comparable<QualitySort> {
         private String url;
         private int quality;
 
@@ -611,5 +611,5 @@ public class QuestionController {
                 return -1;
             }
         }
-    }
+    }*/
 }

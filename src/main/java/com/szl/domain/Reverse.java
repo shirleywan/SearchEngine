@@ -10,13 +10,14 @@ public class Reverse implements Serializable, Comparable<Reverse>{
     private int id;
     private String keyWords;
     private String IDF;
-    private String urls;//多个，中间用DELIMITER隔开
+    private String pageID;//多个，中间用DELIMITER隔开
+    private String qualityAndPID;//多个，中间用DELIMITER隔开
 
     public Reverse() {}
 
-//    public Reverse(String keyWords, String urls) {
+//    public Reverse(String keyWords, String pageID) {
 //        this.keyWords = keyWords;
-//        this.urls = urls;
+//        this.pageID = pageID;
 //    }
 
     @Override
@@ -52,11 +53,19 @@ public class Reverse implements Serializable, Comparable<Reverse>{
         this.IDF = IDF;
     }
 
-    public String getUrls() {
-        return urls;
+    public String getPageID() {
+        return pageID;
     }
 
-    public void setUrls(String urls) {
-        this.urls = urls;
+    public void setPageID(String pageID) {
+        this.pageID = pageID;
+    }
+
+    public String getQualityAndPID() {
+        return qualityAndPID;
+    }
+
+    public void setQualityAndPID(String qualityAndPID) {
+        this.qualityAndPID = qualityAndPID;
     }
 }

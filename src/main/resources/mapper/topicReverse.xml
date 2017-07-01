@@ -8,7 +8,7 @@
         <id property="id" column="id" />
         <result property="keyWords" column="keyWords" />
         <result property="IDF" column="IDF" />
-        <result property="urls" column="urls" />
+        <result property="pageID" column="pageID" />
     </resultMap>
 
     <select id="selectById" resultType="Reverse" >
@@ -24,11 +24,11 @@
     </select>
 
     <insert id="insert" parameterType="Reverse" useGeneratedKeys="true" keyProperty="id">
-        insert into topicr(keyWords,IDF,urls)values(#{keyWords},#{IDF},#{urls})
+        insert into topicr(keyWords,IDF,pageID)values(#{keyWords},#{IDF},#{pageID})
     </insert>
 
     <update id="update" parameterType="Reverse" >
-        update topicr set keyWords=#{keyWords}, IDF=#{IDF}, urls=#{urls} where id=#{id}
+        update topicr set keyWords=#{keyWords}, IDF=#{IDF}, pageID=#{pageID} where id=#{id}
     </update>
 
     <delete id="delete" parameterType="int">

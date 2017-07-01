@@ -13,8 +13,8 @@ public class Forward implements Serializable,Comparable<Forward>{
     private String description;//摘要
     private String qDescription;//摘要
     private int quality;//权重
+    private int tQuality;//关注者，关注者，关注者
     private String keyWords;//关键词
-    private String TF;
 
     private String pro;
     private String user;
@@ -87,6 +87,14 @@ public class Forward implements Serializable,Comparable<Forward>{
         this.quality = quality;
     }
 
+    public int gettQuality() {
+        return tQuality;
+    }
+
+    public void settQuality(int tQuality) {
+        this.tQuality = tQuality;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -103,13 +111,13 @@ public class Forward implements Serializable,Comparable<Forward>{
         this.url = url;
     }
 
-    public String getTF() {
-        return TF;
-    }
-
-    public void setTF(String TF) {
-        this.TF = TF;
-    }
+//    public String getTF() {
+//        return TF;
+//    }
+//
+//    public void setTF(String TF) {
+//        this.TF = TF;
+//    }
 
     public String getPro() {
         return description.split("\\r\\n")[0];
