@@ -1,6 +1,9 @@
 package com.szl.domain;
 
+import com.szl.Config;
+
 import java.io.Serializable;
+import java.util.regex.Pattern;
 
 /**
  * Created by zsc on 2016/12/20.
@@ -10,8 +13,8 @@ public class Forward implements Serializable,Comparable<Forward>{
     private int id;
     private String title;//标题
     private String url;//网页地址
-    private String description;//摘要
-    private String qDescription;//摘要
+    private String description;//用户|点赞数|摘要
+    private String qDescription;//仅摘要
     private int quality;//权重
     private int tQuality;//关注者，关注者，关注者
     private String keyWords;//关键词
@@ -64,7 +67,7 @@ public class Forward implements Serializable,Comparable<Forward>{
     }
 
     public String getqDescription() {
-        return description.split("\\r\\n")[2];
+        return description.split(Pattern.quote(Config.DELIMITER))[2];
     }
 
     public void setqDescription(String qDescription) {
@@ -120,7 +123,7 @@ public class Forward implements Serializable,Comparable<Forward>{
 //    }
 
     public String getPro() {
-        return description.split("\\r\\n")[0];
+        return description.split(Pattern.quote(Config.DELIMITER))[0];
     }
 
     public void setPro(String pro) {
@@ -128,7 +131,7 @@ public class Forward implements Serializable,Comparable<Forward>{
     }
 
     public String getUser() {
-        return description.split("\\r\\n")[1].equals("") ? "匿名用户" : description.split("\\r\\n")[1];
+        return description.split(Pattern.quote(Config.DELIMITER))[1].equals("") ? "匿名用户" : description.split(Pattern.quote(Config.DELIMITER))[1];
     }
 
     public void setUser(String user) {

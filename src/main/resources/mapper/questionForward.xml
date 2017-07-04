@@ -9,6 +9,7 @@
         <result property="url" column="url" />
         <result property="description" column="description" />
         <result property="quality" column="quality" />
+        <result property="tQuality" column="tQuality" />
         <result property="keyWords" column="keyWords" />
     </resultMap>
 

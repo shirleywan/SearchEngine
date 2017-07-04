@@ -19,7 +19,7 @@
                         </div>
                         <div class="col-md-2">
                             <h5><span class="glyphicon glyphicon-user"
-                                      aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
+                                      aria-hidden="true"/>&thinsp;${forward.tQuality}&thinsp;个关注
                             </h5>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                         </div>
                         <div class="col-md-2">
                             <h5><span class="glyphicon glyphicon-user"
-                                      aria-hidden="true"/>&thinsp;${forward.quality}&thinsp;个关注
+                                      aria-hidden="true"/>&thinsp;${forward.tQuality}&thinsp;个关注
                             </h5>
                         </div>
                     </div>

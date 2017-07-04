@@ -23,9 +23,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by zsc on 2017/1/18.
+ * Pattern.quote
+ * 倒排列表插入两次
+ *
  */
 @Controller
 @SessionAttributes("forwards")
@@ -133,6 +137,7 @@ public class QuestionController {
      */
     @RequestMapping("/search")
     public ModelAndView getQuestions(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "type") String type, @RequestParam(value = "q") String questionStr) {
+        long a = System.currentTimeMillis();
         ModelAndView mav = new ModelAndView("frame");
         List<Forward> forwards = null;
         List<Forward> sortedForwards = null;
@@ -224,6 +229,8 @@ public class QuestionController {
         mav.addObject("idCount", allIds.size());
         mav.addObject("type", type);
         mav.addObject("q", questionStr);
+        long b = System.currentTimeMillis();
+        System.out.println("time " + (b - a));
         return mav;
     }
 
@@ -463,9 +470,9 @@ public class QuestionController {
     private void genInSequence(Set<String> urls, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
         if (len == 0) {
             List<String> result = new ArrayList<>();
-            result.addAll(Arrays.asList(temp.get(0).split(Config.DELIMITER)));
+            result.addAll(Arrays.asList(temp.get(0).split(Pattern.quote(Config.DELIMITER))));
             for (int i = 1; i < temp.size(); i++) {
-                result.retainAll(Arrays.asList(temp.get(i).split(Config.DELIMITER)));
+                result.retainAll(Arrays.asList(temp.get(i).split(Pattern.quote(Config.DELIMITER))));
             }
             urls.addAll(result);
             return;
@@ -484,11 +491,11 @@ public class QuestionController {
         if (len == 0) {
             List<String> result = new ArrayList<String>();
             List<String> result2 = new ArrayList<String>();
-            result.addAll(Arrays.asList(temp.get(0).split(Config.DELIMITER)));
-            result2.addAll(Arrays.asList(temp2.get(0).split(Config.DELIMITER)));
+            result.addAll(Arrays.asList(temp.get(0).split(Pattern.quote(Config.DELIMITER))));
+            result2.addAll(Arrays.asList(temp2.get(0).split(Pattern.quote(Config.DELIMITER))));
             for (int i = 1; i < temp.size(); i++) {
-                result.retainAll(Arrays.asList(temp.get(i).split(Config.DELIMITER)));
-                result2.retainAll(Arrays.asList(temp2.get(i).split(Config.DELIMITER)));
+                result.retainAll(Arrays.asList(temp.get(i).split(Pattern.quote(Config.DELIMITER))));
+                result2.retainAll(Arrays.asList(temp2.get(i).split(Pattern.quote(Config.DELIMITER))));
             }
 //            System.out.println(result.toString());
             urls.addAll(result);
