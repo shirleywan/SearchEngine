@@ -11,6 +11,7 @@ public class Reverse implements Serializable, Comparable<Reverse>{
     private String keyWords;
     private String IDF;
     private String pageID;//多个，中间用DELIMITER隔开
+    private String TFIDF;//多个，中间用DELIMITER隔开
     private String qualityAndPID;//多个，中间用DELIMITER隔开
 
     public Reverse() {}
@@ -59,6 +60,15 @@ public class Reverse implements Serializable, Comparable<Reverse>{
 
     public void setPageID(String pageID) {
         this.pageID = pageID;
+    }
+
+
+    public String getTFIDF() {
+        return TFIDF;
+    }
+
+    public void setTFIDF(String TFIDF) {
+        this.TFIDF = TFIDF;
     }
 
     public String getQualityAndPID() {

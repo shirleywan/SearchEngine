@@ -11,6 +11,7 @@
         <result property="quality" column="quality" />
         <result property="tQuality" column="tQuality" />
         <result property="keyWords" column="keyWords" />
+        <result property="TF" column="TF" />
     </resultMap>
 
     <select id="selectById" resultType="Forward" >

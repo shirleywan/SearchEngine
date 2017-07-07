@@ -8,6 +8,7 @@
         <id property="id" column="id" />
         <result property="keyWords" column="keyWords" />
         <result property="IDF" column="IDF" />
+        <result property="TFIDF" column="TFIDF" />
         <result property="pageID" column="pageID" />
     </resultMap>
 

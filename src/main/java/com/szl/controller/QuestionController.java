@@ -1,6 +1,5 @@
 package com.szl.controller;
 
-import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.tokenizer.StandardTokenizer;
 import com.szl.Config;
@@ -29,7 +28,6 @@ import java.util.regex.Pattern;
  * Created by zsc on 2017/1/18.
  * Pattern.quote
  * 倒排列表插入两次
- *
  */
 @Controller
 @SessionAttributes("forwards")
@@ -141,38 +139,27 @@ public class QuestionController {
         ModelAndView mav = new ModelAndView("frame");
         List<Forward> forwards = null;
         List<Forward> sortedForwards = null;
-        List<String> quality = null;
-        Set<String> qualitySet = null;
-        List<Integer> allIds = null;
-        List<Integer> sortedIds = null;
-        List<Integer> everyIds = new ArrayList<Integer>();
-        List<Integer> sortedEveryIds = new ArrayList<Integer>();
+        List<List<Integer>> list = null;
+        List<Integer> leftID = null;
+        List<Integer> rightID = null;
+        List<Integer> leftPageID = new ArrayList<Integer>();
+        List<Integer> rightPageID = new ArrayList<Integer>();
         Long totalCount = -1L;
         Page page = null;
 
         if (type.equals("question")) {
-            qualitySet = new HashSet<String>();
-            sortedIds = new ArrayList<Integer>();
-            allIds = genIds(type, questionStr, qualitySet);
-            quality = new ArrayList<String>(qualitySet);
-            Collections.sort(quality, new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return -o1.compareTo(o2);
-                }
-            });
-            for (String url : quality) {
-                sortedIds.add(Integer.parseInt(url.split(",")[1]));
-            }
-            if (allIds.size() > 0) {
-                totalCount = questionSearchService.getQPageCounts(allIds);
+            list = genIds(type, questionStr);
+            leftID = list.get(0);
+            rightID = list.get(1);
+//            System.out.println("allids " + allIds.size() + "\t" + "sortedids " + sortedIds.size());
+            if (leftID.size() > 0) {
+                totalCount = questionSearchService.getQPageCounts(leftID);
                 //设置分页对象
                 page = PageUtil.executePage(request, totalCount);
-                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
-                    everyIds.add(allIds.get((int) i));
-                    sortedEveryIds.add(sortedIds.get((int) i));
+                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), leftID.size())); i++) {
+                    leftPageID.add(leftID.get((int) i));
+                    rightPageID.add(rightID.get((int) i));
                 }
-//                System.out.println(allIds.size() + everyIds.toString());
                 Cookie cookie = getCookie(request, "zscNav");
                 //首次获取cookie
                 if (cookie == null) {
@@ -188,45 +175,45 @@ public class QuestionController {
                 }
                 //判断标签页，第一次cookie为null
                 if (cookie == null || cookie.getValue().equals("0")) {
-                    forwards = questionSearchService.selectQByPage(everyIds);
+                    forwards = questionSearchService.selectQByPage(leftPageID);
 //                    System.out.println("sss3 " + forwards.size());
                     mav.addObject("forwards", forwards);
                     mav.addObject("nav", "0");
                 } else {
-                    sortedForwards = questionSearchService.selectQByPage(sortedEveryIds);
+                    sortedForwards = questionSearchService.selectQByPage(rightPageID);
                     mav.addObject("sortedForwards", sortedForwards);
                     mav.addObject("nav", "1");
                 }
             }
 
         } else if (type.equals("people")) {
-            allIds = genIds(type, questionStr, qualitySet);
+            leftID = genIds(type, questionStr).get(0);
 
-            if (allIds.size() > 0) {
-                totalCount = questionSearchService.getPPageCounts(allIds);
+            if (leftID.size() > 0) {
+                totalCount = questionSearchService.getPPageCounts(leftID);
                 //设置分页对象
                 page = PageUtil.executePage(request, totalCount);
-                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
-                    everyIds.add(allIds.get((int) i));
+                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), leftID.size())); i++) {
+                    leftPageID.add(leftID.get((int) i));
                 }
-                forwards = questionSearchService.selectPByPage(everyIds);
+                forwards = questionSearchService.selectPByPage(leftPageID);
                 mav.addObject("forwards", forwards);
             }
 
         } else {
-            allIds = genIds(type, questionStr, qualitySet);
-            if (allIds.size() > 0) {
-                totalCount = questionSearchService.getTPageCounts(allIds);
+            leftID = genIds(type, questionStr).get(0);
+            if (leftID.size() > 0) {
+                totalCount = questionSearchService.getTPageCounts(leftID);
                 //设置分页对象
                 page = PageUtil.executePage(request, totalCount);
-                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), allIds.size())); i++) {
-                    everyIds.add(allIds.get((int) i));
+                for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), leftID.size())); i++) {
+                    leftPageID.add(leftID.get((int) i));
                 }
-                forwards = questionSearchService.selectTByPage(everyIds);
+                forwards = questionSearchService.selectTByPage(leftPageID);
                 mav.addObject("forwards", forwards);
             }
         }
-        mav.addObject("idCount", allIds.size());
+        mav.addObject("idCount", leftID.size());
         mav.addObject("type", type);
         mav.addObject("q", questionStr);
         long b = System.currentTimeMillis();
@@ -241,7 +228,7 @@ public class QuestionController {
      * @RequestParam(value="q")中value要和jsp的input的name(只有name，id无所谓)相同，方法为get，post不显示
      */
     @RequestMapping("/nav0")
-    public String nav0(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attributes,@RequestParam(value = "q") String questionStr) {
+    public String nav0(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attributes, @RequestParam(value = "q") String questionStr) {
 
 
 //        Cookie[] cookies = request.getCookies();
@@ -279,7 +266,7 @@ public class QuestionController {
     }
 
     @RequestMapping("/nav1")
-    public String nav1(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attributes,@RequestParam(value = "q") String questionStr) {
+    public String nav1(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attributes, @RequestParam(value = "q") String questionStr) {
 //        Cookie[] cookies = request.getCookies();
 //        if (cookies == null) {
 //            System.out.println("没有cookie==============");
@@ -315,9 +302,8 @@ public class QuestionController {
     /**
      * 根据Cookie名获取对应的Cookie
      *
-     * @param request HttpServletRequest
+     * @param request    HttpServletRequest
      * @param cookieName cookie名称
-     *
      * @return 对应cookie，如果不存在则返回null
      */
     public static Cookie getCookie(HttpServletRequest request, String cookieName) {
@@ -327,7 +313,7 @@ public class QuestionController {
             return null;
 
         for (Cookie c : cookies) {
-            if (c.getName().equals(cookieName)){
+            if (c.getName().equals(cookieName)) {
                 return c;
             }
         }
@@ -335,13 +321,16 @@ public class QuestionController {
     }
 
 
-    private List<Integer> genIds(String type, String str, Set<String> qualitySet) {
+    private List<List<Integer>> genIds(String type, String str) {
         System.out.println(str);
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(StandardTokenizer.segment(str));
         System.out.println("分词结果 " + terms.toString());
 
-        List<Integer> ids = new ArrayList<Integer>();
+        List<List<Integer>> list = new ArrayList<List<Integer>>();
+        List<Integer> defaultID = new ArrayList<Integer>();
+        List<Integer> TFIDFID = new ArrayList<Integer>();
+        List<Integer> qualityID = new ArrayList<Integer>();
         List<Reverse> keyWords = new ArrayList<Reverse>();
         Reverse key;
         for (Term term : terms) {
@@ -379,40 +368,75 @@ public class QuestionController {
         Collections.sort(keyWords);//按IDF大小排序
 
         //得到按序排列的url集合，只要string
-        List<String> sortedUrls = new ArrayList<String>();
-        List<String> sortedQualityUrls = new ArrayList<String>();
+        List<String> TFIDFUrls = new ArrayList<String>();
+        List<String> defaultUrls = new ArrayList<String>();
+        List<String> qualityUrls = new ArrayList<String>();
+
         for (Reverse reverse : keyWords) {
-            sortedUrls.add(reverse.getPageID());
-            sortedQualityUrls.add(reverse.getQualityAndPID());
+            TFIDFUrls.add(reverse.getTFIDF());
+            defaultUrls.add(reverse.getPageID());
+            qualityUrls.add(reverse.getQualityAndPID());
         }
 
         //得到最终排序
-        Set<String> urls = new LinkedHashSet<String>();//保证按顺序且不重复
-//        Set<QualitySort> quality = new TreeSet<QualitySort>();
-        List<String> temp = new ArrayList<String>();
-        List<String> temp2 = new ArrayList<String>();
-        int len = sortedUrls.size() + 1;
+        Set<String> defaultSet = new LinkedHashSet<String>();//保证按顺序且不重复，按关联度&关注度
+        Set<String> TFIDFSet = new LinkedHashSet<String>();//按TFIDF&关注度
+        Set<String> qualitySet = new HashSet<String>();//按关注度
+
+
+        List<String> TFIDFTemp = new ArrayList<String>();
+        List<String> defaultTemp = new ArrayList<String>();
+        List<String> qualityTemp = new ArrayList<String>();
+        int len = defaultUrls.size();
         if (type.equals("question")) {
-            for (int i = len - 1; i != 0; i--) {
-                genQInSequence(urls, qualitySet, sortedUrls, sortedQualityUrls, 0, i, temp, temp2);
+            for (int i = len; i != 0; i--) {
+//                genQInSequence(defaultSet, TFIDFSet, qualitySet, defaultUrls, TFIDFUrls, qualityUrls, 0, i, TFIDFTemp, defaultTemp, qualityTemp);
+                genQInSequence(defaultSet, TFIDFSet, qualitySet, defaultUrls, TFIDFUrls, qualityUrls, len, i);//非递归
             }
+//            genQuestionList(defaultSet, TFIDFSet, qualitySet, defaultUrls, TFIDFUrls, qualityUrls, len);//相关性↑
         } else {
-            for (int i = len - 1; i != 0; i--) {
-                genInSequence(urls, sortedUrls, 0, i, temp);
+            for (int i = len; i != 0; i--) {
+//                genInSequence(defaultSet, defaultUrls, 0, i, defaultTemp);//递归
+                genInSequence(defaultSet, defaultUrls, len, i);//非递归
+
             }
         }
 
         //显示结果
-//        System.out.println("最终url: " + urls);
-        for (String url : urls) {
-            ids.add(Integer.parseInt(url));
+        //默认
+        for (String url : defaultSet) {
+            defaultID.add(Integer.parseInt(url));
         }
 
-        return ids;
+        //TFIDF
+        for (String url : TFIDFSet) {
+            TFIDFID.add(Integer.parseInt(url));
+        }
+
+        //按关注度
+        List<String> quality = new ArrayList<String>(qualitySet);
+
+        Collections.sort(quality, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return -o1.compareTo(o2);
+            }
+        });
+        for (String url : quality) {
+            qualityID.add(Integer.parseInt(url.split(",")[1]));
+        }
+
+        if (type.equals("question")) {
+            list.add(TFIDFID);
+            list.add(defaultID);
+        } else {
+            list.add(defaultID);
+        }
+        return list;
     }
 
     //返回List<Forward>，@Deprecated
-    private List<Forward> genUrls(String type, String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {
+    /*private List<Forward> genUrls(String type, String str, Map<String, Forward> fQuestionsMap, Map<String, Reverse> rQuestionsMap) {
         //得到按序排列的关键字集合
         List<Term> terms = Filter.accept(HanLP.segment(str));
         for (int i = 0; i < terms.size(); i++) {
@@ -464,54 +488,436 @@ public class QuestionController {
 //            System.out.println("最终结果  " + forwards.get(i).getId());
 //        }
         return forwards;
+    }*/
+
+    /**
+     * 只取1234,123,12,1
+     * @param defaultSet
+     * @param TFIDFSet
+     * @param qualitySet
+     * @param defaultUrls
+     * @param TFIDFUrls
+     * @param qualityUrls
+     * @param len
+     */
+    private void genQuestionList(Set<String> defaultSet, Set<String> TFIDFSet, Set<String> qualitySet,
+                                 List<String> defaultUrls, List<String> TFIDFUrls, List<String> qualityUrls, int len) {
+        List<List<String>> defaultList = new ArrayList<List<String>>();
+        List<List<String>> qualityList = new ArrayList<List<String>>();
+        for (int i = 1; i <= len; i++) {
+            if (defaultList.size() == 0) {
+                for (int j = 0; j < i; j++) {
+                    List<String> defaultResult = new ArrayList<String>();
+                    List<String> qualityResult = new ArrayList<String>();
+
+                    defaultResult.addAll(Arrays.asList(defaultUrls.get(0).split(Pattern.quote(Config.DELIMITER))));
+                    qualityResult.addAll(Arrays.asList(qualityUrls.get(0).split(Pattern.quote(Config.DELIMITER))));
+                    for (int k = 1; k < i; k++) {
+                        defaultResult.retainAll(Arrays.asList(defaultUrls.get(k).split(Pattern.quote(Config.DELIMITER))));
+                        qualityResult.retainAll(Arrays.asList(qualityUrls.get(k).split(Pattern.quote(Config.DELIMITER))));
+                    }
+                    defaultList.add(defaultResult);
+                    qualityList.add(qualityResult);
+                }
+            } else {
+                List<String> defaultResult = new ArrayList<String>(defaultList.get(defaultList.size() - 1));
+                defaultResult.retainAll(Arrays.asList(defaultUrls.get(i - 1).split(Pattern.quote(Config.DELIMITER))));
+                defaultList.add(defaultResult);
+                List<String> qualityResult = new ArrayList<String>(qualityList.get(qualityList.size() - 1));
+                qualityResult.retainAll(Arrays.asList(qualityUrls.get(i - 1).split(Pattern.quote(Config.DELIMITER))));
+                qualityList.add(qualityResult);
+            }
+        }
+        for (int i = defaultList.size() - 1; i >= 0; i--) {
+            defaultSet.addAll(defaultList.get(i));
+            qualitySet.addAll(qualityList.get(i));
+        }
+
     }
 
+
+    /**
+     * 非递归begin
+     */
+    //获取长度为len的组合数C(arrLen,len)的个数
+    private static int getCountOfCombinations(int arrLen, int len) {
+        int m = 1;
+        for (int i = 0; i < len; i++) {
+            m *= arrLen - i;
+        }
+        int n = 1;
+        for (int i = len; i > 1; i--) {
+            n *= i;
+        }
+        return m / n;
+    }
+    
+    
+    private void genInSequence(Set<String> defaultSet, List<String> defaultUrls, int len, int subLen) {
+        List<String> tempList = new ArrayList<String>();
+        int[] array = new int[len];
+        for (int j = 0; j < len; j++) {
+            if (j < subLen) {
+                array[j] = 1;
+            } else {
+                array[j] = 0;
+            }
+        }
+
+
+        //得到C(len,subLen)
+        for (int j = 0; j < array.length; j++) {
+            if (array[j] == 1) {
+                tempList.add(defaultUrls.get(j));
+            }
+        }
+        List<String> result = new ArrayList<String>();
+        result.addAll(Arrays.asList(tempList.get(0).split(Pattern.quote(Config.DELIMITER))));
+        for (int i = 1; i < tempList.size(); i++) {
+            result.retainAll(Arrays.asList(tempList.get(i).split(Pattern.quote(Config.DELIMITER))));
+        }
+        defaultSet.addAll(result);
+
+
+
+        int n = getCountOfCombinations(len, subLen);//得到C(len,i)组合数个数
+        for (int j = 1; j < n; j++) {
+            for (int k = array.length - 1; k > 0; k--) {
+                if (array[k] == 0 && array[k - 1] == 1) {
+                    array[k] = 1;
+                    array[k - 1] = 0;
+                    int start = k;
+                    int end = len - 1;
+                    while (true) {
+                        while (array[start] == 1) {
+                            start++;
+                            if (start >= len)
+                                break;
+                        }
+                        while (array[end] == 0) {
+                            end--;
+                            if (end < k)
+                                break;
+                        }
+
+                        if (start < end) {
+                            int temp = array[end];
+                            array[end] = array[start];
+                            array[start] = temp;
+                        } else {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            //得到一条组合
+            tempList = new ArrayList<String>();
+            for (int k = 0; k < array.length; k++) {
+                if (array[k] == 1) {
+                    tempList.add(defaultUrls.get(k));
+                }
+            }
+            result = new ArrayList<String>();
+            result.addAll(Arrays.asList(tempList.get(0).split(Pattern.quote(Config.DELIMITER))));
+            for (int i = 1; i < tempList.size(); i++) {
+                result.retainAll(Arrays.asList(tempList.get(i).split(Pattern.quote(Config.DELIMITER))));
+            }
+            defaultSet.addAll(result);
+        }
+    }
+
+
+    private void genQInSequence(Set<String> defaultSet, Set<String> TFIDFSet, Set<String> qualitySet, List<String> defaultUrls,
+                                List<String> TFIDFUrls, List<String> qualityUrls, int len, int subLen) {
+        List<String> defaultTemp = new ArrayList<String>();
+        List<String> TFIDFTemp = new ArrayList<String>();
+        List<String> qualityTemp = new ArrayList<String>();
+
+        int[] array = new int[len];
+        for (int j = 0; j < len; j++) {
+            if (j < subLen) {
+                array[j] = 1;
+            } else {
+                array[j] = 0;
+            }
+        }
+
+        //得到C(len,subLen)
+        for (int j = 0; j < array.length; j++) {
+            if (array[j] == 1) {
+                defaultTemp.add(defaultUrls.get(j));
+                TFIDFTemp.add(TFIDFUrls.get(j));
+                qualityTemp.add(qualityUrls.get(j));
+            }
+        }
+        List<String> TFIDFResult = new ArrayList<String>();
+        List<String> tempList = new ArrayList<String>();
+        List<String> defaultResult = new ArrayList<String>();
+        List<String> qualityResult = new ArrayList<String>();
+        defaultResult.addAll(Arrays.asList(defaultTemp.get(0).split(Pattern.quote(Config.DELIMITER))));
+        qualityResult.addAll(Arrays.asList(qualityTemp.get(0).split(Pattern.quote(Config.DELIMITER))));
+
+        HashMap<String, String> resultMap = new HashMap<String, String>();
+        for (String str : Arrays.asList(TFIDFTemp.get(0).split(Pattern.quote(Config.DELIMITER)))) {
+            resultMap.put(str.split(",")[0], str.split(",")[1]);
+        }
+        if (defaultTemp.size() == 1) {
+//                ArrayList<String> list = new ArrayList<String>();
+            for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                tempList.add(new StringBuilder().append(entry.getValue()).append(",").append(entry.getKey()).toString());
+            }
+            Collections.sort(tempList, new Comparator<String>() {
+                @Override
+                public int compare(String str1, String str2) {
+                    return -str1.compareTo(str2);
+                }
+            });
+        }
+        for (int i = 1; i < defaultTemp.size(); i++) {
+            HashMap<String, String> resultMap2 = new HashMap<String, String>();
+            for (String str : Arrays.asList(TFIDFTemp.get(i).split(Pattern.quote(Config.DELIMITER)))) {
+                resultMap2.put(str.split(",")[0], str.split(",")[1]);
+            }
+            resultMap = intersect(resultMap, resultMap2);
+            defaultResult.retainAll(Arrays.asList(defaultTemp.get(i).split(Pattern.quote(Config.DELIMITER))));
+            qualityResult.retainAll(Arrays.asList(qualityTemp.get(i).split(Pattern.quote(Config.DELIMITER))));
+        }
+
+        for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+            //TFIDF的和，PID
+            tempList.add(new StringBuilder().append(entry.getValue()).append(",").append(entry.getKey()).toString());
+        }
+        Collections.sort(tempList, new Comparator<String>() {
+            @Override
+            public int compare(String str1, String str2) {
+                return -str1.compareTo(str2);
+            }
+        });
+        for (String str : tempList) {
+            TFIDFResult.add(str.split(",")[1]);
+        }
+        TFIDFSet.addAll(TFIDFResult);
+        defaultSet.addAll(defaultResult);
+        qualitySet.addAll(qualityResult);
+
+
+
+        int n = getCountOfCombinations(len, subLen);//得到C(len,i)组合数个数
+        for (int j = 1; j < n; j++) {
+            for (int k = array.length - 1; k > 0; k--) {
+                if (array[k] == 0 && array[k - 1] == 1) {
+                    array[k] = 1;
+                    array[k - 1] = 0;
+                    int start = k;
+                    int end = len - 1;
+                    while (true) {
+                        while (array[start] == 1) {
+                            start++;
+                            if (start >= len)
+                                break;
+                        }
+                        while (array[end] == 0) {
+                            end--;
+                            if (end < k)
+                                break;
+                        }
+
+                        if (start < end) {
+                            int temp = array[end];
+                            array[end] = array[start];
+                            array[start] = temp;
+                        } else {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+
+            //得到一条组合
+            defaultTemp = new ArrayList<String>();
+            TFIDFTemp = new ArrayList<String>();
+            qualityTemp = new ArrayList<String>();
+            for (int k = 0; k < array.length; k++) {
+                if (array[k] == 1) {
+                    defaultTemp.add(defaultUrls.get(k));
+                    TFIDFTemp.add(TFIDFUrls.get(k));
+                    qualityTemp.add(qualityUrls.get(k));
+                }
+            }
+            TFIDFResult = new ArrayList<String>();
+            tempList = new ArrayList<String>();
+            defaultResult = new ArrayList<String>();
+            qualityResult = new ArrayList<String>();
+            defaultResult.addAll(Arrays.asList(defaultTemp.get(0).split(Pattern.quote(Config.DELIMITER))));
+            qualityResult.addAll(Arrays.asList(qualityTemp.get(0).split(Pattern.quote(Config.DELIMITER))));
+
+            resultMap = new HashMap<String, String>();
+            for (String str : Arrays.asList(TFIDFTemp.get(0).split(Pattern.quote(Config.DELIMITER)))) {
+                resultMap.put(str.split(",")[0], str.split(",")[1]);
+            }
+            if (defaultTemp.size() == 1) {
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    tempList.add(new StringBuilder().append(entry.getValue()).append(",").append(entry.getKey()).toString());
+                }
+                Collections.sort(tempList, new Comparator<String>() {
+                    @Override
+                    public int compare(String str1, String str2) {
+                        return -str1.compareTo(str2);
+                    }
+                });
+            }
+            for (int i = 1; i < defaultTemp.size(); i++) {
+                HashMap<String, String> resultMap2 = new HashMap<String, String>();
+                for (String str : Arrays.asList(TFIDFTemp.get(i).split(Pattern.quote(Config.DELIMITER)))) {
+                    resultMap2.put(str.split(",")[0], str.split(",")[1]);
+                }
+                resultMap = intersect(resultMap, resultMap2);
+                defaultResult.retainAll(Arrays.asList(defaultTemp.get(i).split(Pattern.quote(Config.DELIMITER))));
+                qualityResult.retainAll(Arrays.asList(qualityTemp.get(i).split(Pattern.quote(Config.DELIMITER))));
+            }
+
+            for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                //TFIDF的和，PID
+                tempList.add(new StringBuilder().append(entry.getValue()).append(",").append(entry.getKey()).toString());
+            }
+            Collections.sort(tempList, new Comparator<String>() {
+                @Override
+                public int compare(String str1, String str2) {
+                    return -str1.compareTo(str2);
+                }
+            });
+            for (String str : tempList) {
+                TFIDFResult.add(str.split(",")[1]);
+            }
+            TFIDFSet.addAll(TFIDFResult);
+            defaultSet.addAll(defaultResult);
+            qualitySet.addAll(qualityResult);
+        }
+    }
+    /**
+     * 非递归end
+     */
+
+
+    /**
+     * 递归begin
+     */
+
     //非问题递归获取全组合，并返回求交集后的结果
-    private void genInSequence(Set<String> urls, List<String> sortedUrls, int start, int len, List<String> temp) {//len为组合的长度
+    private void genInSequence(Set<String> defaultSet, List<String> defaultUrls, int start, int len, List<String> temp) {//len为组合的长度
         if (len == 0) {
-            List<String> result = new ArrayList<>();
+            List<String> result = new ArrayList<String>();
             result.addAll(Arrays.asList(temp.get(0).split(Pattern.quote(Config.DELIMITER))));
             for (int i = 1; i < temp.size(); i++) {
                 result.retainAll(Arrays.asList(temp.get(i).split(Pattern.quote(Config.DELIMITER))));
             }
-            urls.addAll(result);
+            defaultSet.addAll(result);
             return;
         }
-        if (start == sortedUrls.size()) {
+        if (start == defaultUrls.size()) {
             return;
         }
-        temp.add(sortedUrls.get(start));
-        genInSequence(urls, sortedUrls, start + 1, len - 1, temp);
+        temp.add(defaultUrls.get(start));
+        genInSequence(defaultSet, defaultUrls, start + 1, len - 1, temp);
         temp.remove(temp.size() - 1);
-        genInSequence(urls, sortedUrls, start + 1, len, temp);
+        genInSequence(defaultSet, defaultUrls, start + 1, len, temp);
     }
 
     //问题递归获取全组合，并返回求交集后的结果
-    private void genQInSequence(Set<String> urls, Set<String> qualitySet, List<String> sortedUrls, List<String> sortedQualityUrls, int start, int len, List<String> temp, List<String> temp2) {//len为组合的长度
+    private void genQInSequence(Set<String> defaultSet, Set<String> TFIDFSet, Set<String> qualitySet, List<String> defaultUrls,
+                                List<String> TFIDFUrls, List<String> qualityUrls, int start, int len,
+                                List<String> TFIDFTemp, List<String> defaultTemp, List<String> qualityTemp) {//len为组合的长度
         if (len == 0) {
-            List<String> result = new ArrayList<String>();
-            List<String> result2 = new ArrayList<String>();
-            result.addAll(Arrays.asList(temp.get(0).split(Pattern.quote(Config.DELIMITER))));
-            result2.addAll(Arrays.asList(temp2.get(0).split(Pattern.quote(Config.DELIMITER))));
-            for (int i = 1; i < temp.size(); i++) {
-                result.retainAll(Arrays.asList(temp.get(i).split(Pattern.quote(Config.DELIMITER))));
-                result2.retainAll(Arrays.asList(temp2.get(i).split(Pattern.quote(Config.DELIMITER))));
+            List<String> TFIDFResult = new ArrayList<String>();
+            List<String> tempList = new ArrayList<String>();
+            List<String> defaultResult = new ArrayList<String>();
+            List<String> qualityResult = new ArrayList<String>();
+            defaultResult.addAll(Arrays.asList(defaultTemp.get(0).split(Pattern.quote(Config.DELIMITER))));
+            qualityResult.addAll(Arrays.asList(qualityTemp.get(0).split(Pattern.quote(Config.DELIMITER))));
+
+            HashMap<String, String> resultMap = new HashMap<String, String>();
+            for (String str : Arrays.asList(TFIDFTemp.get(0).split(Pattern.quote(Config.DELIMITER)))) {
+                resultMap.put(str.split(",")[0], str.split(",")[1]);
             }
-//            System.out.println(result.toString());
-            urls.addAll(result);
-            qualitySet.addAll(result2);
+            if (defaultTemp.size() == 1) {
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    tempList.add(new StringBuilder().append(entry.getValue()).append(",").append(entry.getKey()).toString());
+                }
+                Collections.sort(tempList, new Comparator<String>() {
+                    @Override
+                    public int compare(String str1, String str2) {
+                        return -str1.compareTo(str2);
+                    }
+                });
+            }
+            for (int i = 1; i < defaultTemp.size(); i++) {
+                HashMap<String, String> resultMap2 = new HashMap<String, String>();
+                for (String str : Arrays.asList(TFIDFTemp.get(i).split(Pattern.quote(Config.DELIMITER)))) {
+                    resultMap2.put(str.split(",")[0], str.split(",")[1]);
+                }
+                resultMap = intersect(resultMap, resultMap2);
+                defaultResult.retainAll(Arrays.asList(defaultTemp.get(i).split(Pattern.quote(Config.DELIMITER))));
+                qualityResult.retainAll(Arrays.asList(qualityTemp.get(i).split(Pattern.quote(Config.DELIMITER))));
+            }
+
+            for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                //TFIDF的和，PID
+                tempList.add(new StringBuilder().append(entry.getValue()).append(",").append(entry.getKey()).toString());
+            }
+            Collections.sort(tempList, new Comparator<String>() {
+                @Override
+                public int compare(String str1, String str2) {
+                    return -str1.compareTo(str2);
+                }
+            });
+            for (String str : tempList) {
+                TFIDFResult.add(str.split(",")[1]);
+            }
+            TFIDFSet.addAll(TFIDFResult);
+            defaultSet.addAll(defaultResult);
+            qualitySet.addAll(qualityResult);
             return;
         }
-        if (start == sortedUrls.size()) {
+        if (start == defaultUrls.size()) {
             return;
         }
-        temp.add(sortedUrls.get(start));
-        temp2.add(sortedQualityUrls.get(start));
-        genQInSequence(urls, qualitySet, sortedUrls, sortedQualityUrls, start + 1, len - 1, temp, temp2);
-        temp.remove(temp.size() - 1);
-        temp2.remove(temp2.size() - 1);
-        genQInSequence(urls, qualitySet, sortedUrls, sortedQualityUrls, start + 1, len, temp, temp2);
+        TFIDFTemp.add(TFIDFUrls.get(start));
+        defaultTemp.add(defaultUrls.get(start));
+        qualityTemp.add(qualityUrls.get(start));
+        genQInSequence(defaultSet, TFIDFSet, qualitySet, defaultUrls,TFIDFUrls, qualityUrls, start + 1, len - 1, TFIDFTemp, defaultTemp, qualityTemp);
+        TFIDFTemp.remove(TFIDFTemp.size() - 1);
+        defaultTemp.remove(defaultTemp.size() - 1);
+        qualityTemp.remove(qualityTemp.size() - 1);
+        genQInSequence(defaultSet, TFIDFSet, qualitySet, defaultUrls, TFIDFUrls, qualityUrls, start + 1, len, TFIDFTemp, defaultTemp, qualityTemp);
     }
+
+    private HashMap<String, String> intersect(HashMap<String, String> hashMap1, HashMap<String, String> hashMap2) {
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+        if (hashMap1.size() > hashMap2.size()) {
+            for (Map.Entry<String, String> entry : hashMap1.entrySet()) {
+                if (hashMap2.containsKey(entry.getKey())) {
+                    //TFIDF的和，PID
+                    hashMap.put(entry.getKey(), new StringBuilder().append(String.valueOf(Double.valueOf(entry.getValue()) +
+                            Double.valueOf(hashMap2.get(entry.getKey())))).toString());
+                }
+            }
+        } else {
+            for (Map.Entry<String, String> entry : hashMap2.entrySet()) {
+                if (hashMap1.containsKey(entry.getKey())) {
+                    //TFIDF的和，PID
+                    hashMap.put(entry.getKey(), new StringBuilder().append(String.valueOf(Double.valueOf(entry.getValue()) +
+                            Double.valueOf(hashMap1.get(entry.getKey())))).toString());
+                }
+            }
+        }
+        return hashMap;
+    }
+    /**
+     * 递归end
+     */
 
     /*class TF_IDF implements Comparable<TF_IDF> {
         private double TF;
