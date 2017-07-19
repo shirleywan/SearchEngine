@@ -6,6 +6,7 @@ import com.szl.dao.QuestionForwardDao;
 import com.szl.dao.QuestionReverseDao;
 import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
+import com.szl.util.Filter;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

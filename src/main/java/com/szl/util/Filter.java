@@ -1,4 +1,4 @@
-package com.szl;
+package com.szl.util;
 
 import com.hankcs.hanlp.seg.common.Term;
 
@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by zsc on 2016/12/17.
+ * 按词性过滤
  */
 public class Filter {
     public static List<Term> accept(List<Term> termList){

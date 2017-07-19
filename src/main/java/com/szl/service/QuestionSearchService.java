@@ -3,14 +3,17 @@ package com.szl.service;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.tokenizer.StandardTokenizer;
-import com.szl.Filter;
+import com.szl.page.Page;
+import com.szl.util.Filter;
 import com.szl.dao.*;
 import com.szl.domain.Forward;
 import com.szl.domain.Reverse;
+import com.szl.util.PageNumUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,20 +26,20 @@ import java.util.Map;
  */
 @Service
 public class QuestionSearchService implements SearchService {
-    private List<Forward> fQuestions;
-    private List<Reverse> rQuestions;
-    private Map<String, Reverse> rQuestionsMap = new HashMap<String, Reverse>();
-    private Map<String, Forward> fQuestionsMap = new HashMap<String, Forward>();
-
-    private List<Forward> fPeoples;
-    private List<Reverse> rPeoples;
-    private Map<String, Reverse> rPeoplesMap = new HashMap<String, Reverse>();
-    private Map<String, Forward> fPeoplesMap = new HashMap<String, Forward>();
-
-    private List<Forward> fTopics;
-    private List<Reverse> rTopics;
-    private Map<String, Reverse> rTopicsMap = new HashMap<String, Reverse>();
-    private Map<String, Forward> fTopicsMap = new HashMap<String, Forward>();
+//    private List<Forward> fQuestions;
+//    private List<Reverse> rQuestions;
+//    private Map<String, Reverse> rQuestionsMap = new HashMap<String, Reverse>();
+//    private Map<String, Forward> fQuestionsMap = new HashMap<String, Forward>();
+//
+//    private List<Forward> fPeoples;
+//    private List<Reverse> rPeoples;
+//    private Map<String, Reverse> rPeoplesMap = new HashMap<String, Reverse>();
+//    private Map<String, Forward> fPeoplesMap = new HashMap<String, Forward>();
+//
+//    private List<Forward> fTopics;
+//    private List<Reverse> rTopics;
+//    private Map<String, Reverse> rTopicsMap = new HashMap<String, Reverse>();
+//    private Map<String, Forward> fTopicsMap = new HashMap<String, Forward>();
 
     @Autowired
     private QuestionForwardDao questionForwardDao;
@@ -57,44 +60,44 @@ public class QuestionSearchService implements SearchService {
     private TopicReverseDao topicReverseDao;
 
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         System.out.println("@PostConstruct方法被调用");
-//        fQuestions = getFQuestions();
-//        rQuestions = getRQuestions();//将数据库的问题正排和倒排读进来
-//        fPeoples = getFPeoples();
-//        rPeoples = getRPeoples();
-//        fTopics = getFTopics();
-//        rTopics = getRTopics();
-        //将2个表读到Map里
-//        for (Reverse question : rQuestions) {
-//            rQuestionsMap.put(question.getKeyWords(), question);
-//        }
-//
-//        for (Forward question : fQuestions) {
-//            fQuestionsMap.put(String.valueOf(question.getId()), question);
-//        }
-//        System.out.println("问题倒排列表 " + rQuestionsMap.size() + "     " + "问题正排列表 " +  fQuestionsMap.size());
-//
-//        for (Reverse people : rPeoples) {
-//            rPeoplesMap.put(people.getKeyWords(), people);
-//        }
-//
-//        for (Forward people : fPeoples) {
-//            fPeoplesMap.put(String.valueOf(people.getId()), people);
-//        }
-//        System.out.println("用户倒排列表 " + rPeoplesMap.size() + "     " + "用户正排列表 " + fPeoplesMap.size());
-//
-//        for (Reverse people : rTopics) {
-//            rTopicsMap.put(people.getKeyWords(), people);
-//        }
-//
-//        for (Forward people : fTopics) {
-//            fTopicsMap.put(String.valueOf(people.getId()), people);
-//        }
-//        System.out.println("话题倒排列表 " + rTopicsMap.size() + "     " + "话题正排列表 " + fTopicsMap.size());
+        fQuestions = getFQuestions();
+        rQuestions = getRQuestions();//将数据库的问题正排和倒排读进来
+        fPeoples = getFPeoples();
+        rPeoples = getRPeoples();
+        fTopics = getFTopics();
+        rTopics = getRTopics();
+        将2个表读到Map里
+        for (Reverse question : rQuestions) {
+            rQuestionsMap.put(question.getKeyWords(), question);
+        }
 
-    }
+        for (Forward question : fQuestions) {
+            fQuestionsMap.put(String.valueOf(question.getId()), question);
+        }
+        System.out.println("问题倒排列表 " + rQuestionsMap.size() + "     " + "问题正排列表 " +  fQuestionsMap.size());
+
+        for (Reverse people : rPeoples) {
+            rPeoplesMap.put(people.getKeyWords(), people);
+        }
+
+        for (Forward people : fPeoples) {
+            fPeoplesMap.put(String.valueOf(people.getId()), people);
+        }
+        System.out.println("用户倒排列表 " + rPeoplesMap.size() + "     " + "用户正排列表 " + fPeoplesMap.size());
+
+        for (Reverse people : rTopics) {
+            rTopicsMap.put(people.getKeyWords(), people);
+        }
+
+        for (Forward people : fTopics) {
+            fTopicsMap.put(String.valueOf(people.getId()), people);
+        }
+        System.out.println("话题倒排列表 " + rTopicsMap.size() + "     " + "话题正排列表 " + fTopicsMap.size());
+
+    }*/
 
     public void test() {
 //        HanLP.Config.ShowTermNature = true;
@@ -108,13 +111,37 @@ public class QuestionSearchService implements SearchService {
         System.out.println(terms2.toString());
     }
 
-    public Map<String, Forward> getfQuestionsMap() {
-        return fQuestionsMap;
-    }
+//    public Map<String, Forward> getfQuestionsMap() {
+//        return fQuestionsMap;
+//    }
+//
+//    public Map<String, Reverse> getrQuestionsMap() {
+//        return rQuestionsMap;
+//    }
 
-    public Map<String, Reverse> getrQuestionsMap() {
-        return rQuestionsMap;
-    }
+//    public Map<String, Forward> getfPeoplesMap() {
+//        return fPeoplesMap;
+//    }
+//
+//    public Map<String, Reverse> getrPeoplesMap() {
+//        return rPeoplesMap;
+//    }
+//
+//    private List<Forward> getFPeoples() {
+//        return peopleForwardDao.selectAll();
+//    }
+//
+//    private List<Reverse> getRPeoples() {
+//        return peopleReverseDao.selectAll();
+//    }
+//
+//    public Map<String, Forward> getfTopicsMap() {
+//        return fTopicsMap;
+//    }
+//
+//    public Map<String, Reverse> getrTopicsMap() {
+//        return rTopicsMap;
+//    }
 
     private List<Forward> getFQuestions() {
         return questionForwardDao.selectAll();
@@ -122,30 +149,6 @@ public class QuestionSearchService implements SearchService {
 
     private List<Reverse> getRQuestions() {
         return questionReverseDao.selectAll();
-    }
-
-    public Map<String, Forward> getfPeoplesMap() {
-        return fPeoplesMap;
-    }
-
-    public Map<String, Reverse> getrPeoplesMap() {
-        return rPeoplesMap;
-    }
-
-    private List<Forward> getFPeoples() {
-        return peopleForwardDao.selectAll();
-    }
-
-    private List<Reverse> getRPeoples() {
-        return peopleReverseDao.selectAll();
-    }
-
-    public Map<String, Forward> getfTopicsMap() {
-        return fTopicsMap;
-    }
-
-    public Map<String, Reverse> getrTopicsMap() {
-        return rTopicsMap;
     }
 
     private List<Forward> getFTopics() {
@@ -191,6 +194,63 @@ public class QuestionSearchService implements SearchService {
     public Reverse getTUrls(String keywords) {
         return topicReverseDao.selectByKeyWords(keywords);
     }
+
+    /**
+     * use Util
+     * @param type 类型
+     * @param questionStr 内容
+     * @return list
+     */
+    public List<List<Integer>> getAllID(String type, String questionStr) {
+        List<List<Integer>> list = new ArrayList<List<Integer>>();
+        List<Reverse> keyWords=getAllReverse(type, questionStr);
+        PageNumUtil.genIds(type, keyWords, list);
+        return list;
+    }
+
+    //获取所有倒排列表
+    private List<Reverse> getAllReverse(String type, String questionStr) {
+        System.out.println(questionStr);
+        //得到按序排列的关键字集合
+        List<Term> terms = Filter.accept(StandardTokenizer.segment(questionStr));
+        System.out.println("分词结果 " + terms.toString());
+        List<Reverse> keyWords = new ArrayList<Reverse>();
+        Reverse key;
+        for (Term term : terms) {
+            if (type.equals("question")) {
+                key = getQUrls(term.word);
+            } else if (type.equals("people")) {
+                key = getPUrls(term.word);
+            } else {
+                key = getTUrls(term.word);
+            }
+
+
+            if (key != null) {
+                keyWords.add(key);
+            }
+        }
+        return keyWords;
+    }
+
+    //生成左边ID
+    public List<Integer> getLeftPageID(Page page, List<Integer> leftID) {
+        List<Integer> leftPageID = new ArrayList<Integer>();
+        for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), leftID.size())); i++) {
+            leftPageID.add(leftID.get((int) i));
+        }
+        return leftPageID;
+    }
+
+    //生成右边ID
+    public List<Integer> getLRightPageID(Page page, List<Integer> rightID) {
+        List<Integer> rightPageID = new ArrayList<Integer>();
+        for (long i = page.getBeginIndex(); i < (Math.min(page.getEndinIndex(), rightID.size())); i++) {
+            rightPageID.add(rightID.get((int) i));
+        }
+        return rightPageID;
+    }
+
 
     //分页插件
     public List<Forward> selectQByMap(Map<String, Object> map) {
