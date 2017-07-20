@@ -116,6 +116,14 @@
         </dependency>
         <!--aspectj end-->
 
+        <!--cglib start-->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+        <!--cglib end-->
+
         <!--c3p0-->
         <!--<dependency>-->
             <!--<groupId>com.mchange</groupId>-->

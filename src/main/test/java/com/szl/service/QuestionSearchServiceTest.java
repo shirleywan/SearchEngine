@@ -14,5 +14,6 @@ public class QuestionSearchServiceTest extends SpringTestCase {
     @Test
     public void selectUserByIdTest(){
         questionSearchService.test();
+        questionSearchService.getAllID("question", "阿里");
     }
 }
