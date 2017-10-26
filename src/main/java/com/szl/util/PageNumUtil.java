@@ -297,6 +297,17 @@ public class PageNumUtil {
     }
 
 
+    /**
+     * 本身ID就是按照quality排序的，所以直接调用retainAll即可
+     * @param defaultSet
+     * @param TFIDFSet
+     * @param qualitySet
+     * @param defaultUrls
+     * @param TFIDFUrls
+     * @param qualityUrls
+     * @param len
+     * @param subLen
+     */
     private static void genQInSequence(Set<String> defaultSet, Set<String> TFIDFSet, Set<String> qualitySet, List<String> defaultUrls,
                                 List<String> TFIDFUrls, List<String> qualityUrls, int len, int subLen) {
         List<String> defaultTemp = new ArrayList<String>();
